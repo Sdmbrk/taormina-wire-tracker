@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.0.1</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.0.2</title>
 <style>
 :root{
   --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
@@ -280,6 +280,13 @@ footer b{color:var(--teal-d)}
 .notice-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
 .notice-list{margin:0;padding-left:18px;font-size:14px;display:grid;gap:4px}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f2747">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wire Tracker">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 </head>
 <body>
 <header>
@@ -295,16 +302,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.0.1</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.0.2</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.0.1';
+var APP_VERSION = '2.0.2';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
 var CHANGELOG = [
+  { v: '2.0.2', d: '2026-11-14', t: 'Installable app: the page now has a web app manifest, icons and a service worker. Android offers Install app; on iPhone, Add to Home Screen opens it full screen. Live data is never cached.' },
   { v: '2.0.1', d: '2026-11-14', t: 'Added the SDMBRK logo to the header: three wires in the red, yellow and blue core colours.' },
   { v: '2.0.0', d: '2026-11-14', t: 'Shared data. Every phone and computer now uses one shared store (Supabase, tables wt_*) and refreshes every 10 seconds. Accounts are kept on the server and passwords are stored as hashes, so they can no longer be shown; the admin resets them. Storekeeper previews each wire in or wire out and confirms it; a confirmed entry is saved and locked. Edits and deletes go to the admin for approval. Foreman requests stock out to a named person by TH, villa, size, colour and rolls; the storekeeper accepts and stock out is recorded automatically. New updates appear as notes and toasts, and the Overview shows requests and activity cards. Undo and redo are removed for shared data. Restoring an old backup file is switched off.' },
   { v: '1.13.6', d: '2026-11-14', t: 'Undo and Redo buttons at the top of every page step back and forward through data changes (wire out, wire in, blocks, villa types, deletes and resets). The last 50 changes are kept for this browser session.' },
@@ -2578,6 +2586,9 @@ $('ver').textContent = 'v' + APP_VERSION;
 render();
 boot();
 
+</script>
+<script>
+if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
 </script>
 </body>
 </html>
