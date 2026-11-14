@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taormina Village-01 · Wire Issue Tracker v2.0.0</title>
+<style>
+:root{
+  --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
+  --ink:#14213d;--muted:#64748b;--line:#e2e8f0;--bg:#f1f7f7;
+  --amber:#d97706;--amber-l:#fef3c7;--green:#15803d;--green-l:#dcfce7;--red:#dc2626;--red-l:#fee2e2;
+  --shadow:0 1px 2px rgba(15,39,71,.05),0 12px 30px -14px rgba(15,39,71,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);
+  background:radial-gradient(1100px 420px at 8% -12%,#bff0ea,transparent 60%),var(--bg);font-size:14px;-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(120deg,var(--navy) 0%,var(--navy-2) 55%,var(--teal-d) 100%);color:#fff;padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 10px 30px -12px rgba(15,39,71,.6)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#5eead4,#0d9488);display:grid;place-items:center;font-weight:800;color:var(--navy);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.2px}
+header p{margin:3px 0 0;font-size:12px;opacity:.75}
+.ver{font-size:12px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);padding:5px 12px;border-radius:999px}
+nav{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:6px;overflow-x:auto}
+nav button{font:inherit;font-weight:600;border:0;background:transparent;padding:9px 16px;border-radius:999px;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
+nav button:hover{color:var(--teal-d);background:var(--teal-l)}
+nav button.on{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;box-shadow:0 8px 18px -8px rgba(13,148,136,.8)}
+main{max-width:1280px;margin:0 auto;padding:22px 16px 40px}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px;margin-bottom:20px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.card-h h2{font-size:17px;margin:2px 0 0;color:var(--navy)}
+.eyebrow{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--teal-d);font-weight:700}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+.grid-chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-weight:600;font-size:13px;border:1px solid #cfe3e1;background:#fff;color:var(--navy);padding:9px 15px;border-radius:999px;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--teal);color:var(--teal-d);transform:translateY(-1px)}
+.chip.on{background:linear-gradient(135deg,var(--teal),var(--teal-d));border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px rgba(13,148,136,.85)}
+.chip.sm{padding:6px 12px;font-size:12px}
+.chip.vt-ok,.chip.on.vt-ok{background:#16a34a;border-color:#15803d;color:#fff;box-shadow:0 6px 14px -8px rgba(22,163,74,.9)}
+.chip.vt-pos,.chip.on.vt-pos{background:#ea580c;border-color:#c2410c;color:#fff;box-shadow:0 6px 14px -8px rgba(234,88,12,.9)}
+.chip.vt-over,.chip.on.vt-over{background:#dc2626;border-color:#991b1b;color:#fff;box-shadow:0 6px 14px -8px rgba(220,38,38,.9)}
+.chip.tone-ok{background:#dcfce7;border-color:#16a34a;color:#15803d}
+.chip.tone-pos{background:#ffedd5;border-color:#ea580c;color:#c2410c}
+.chip.tone-over{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+.chip.on.tone-ok{background:#16a34a;border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px rgba(22,163,74,.85)}
+.chip.on.tone-pos{background:#ea580c;border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px rgba(234,88,12,.85)}
+.chip.on.tone-over{background:#dc2626;border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px rgba(220,38,38,.85)}
+.seg{display:inline-flex;background:#eef5f5;border-radius:16px;padding:5px;gap:4px;flex-wrap:wrap}
+.seg button{font:inherit;font-weight:700;border:0;background:transparent;padding:11px 18px;border-radius:12px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:9px;transition:all .15s}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 4px 12px -4px rgba(15,39,71,.3)}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block;flex:none}
+.stepper{display:inline-flex;align-items:center;background:#f7fbfb;border:1px solid #cfe3e1;border-radius:16px;padding:5px;gap:2px}
+.stepper button{width:36px;height:36px;border-radius:12px;border:0;background:#fff;color:var(--teal-d);font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(15,39,71,.12);transition:all .12s;line-height:1}
+.stepper button:hover{background:var(--teal);color:#fff}
+.stepper input{width:82px;border:0;background:transparent;text-align:center;font:inherit;font-weight:800;font-size:16px;color:var(--navy);outline:none;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper .u{font-size:12px;color:var(--muted);padding:0 10px 0 4px;font-weight:700}
+.stepper.sm button{width:30px;height:30px;font-size:17px;border-radius:10px}
+.stepper.sm input{width:56px;font-size:14px}
+input.txt,select.txt,textarea.txt{font:inherit;border:1px solid #cfe3e1;border-radius:12px;padding:10px 13px;background:#fff;color:var(--ink);outline:none;min-width:0;width:100%}
+input.txt:focus,textarea.txt:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(13,148,136,.15)}
+textarea.txt{min-height:120px;font-family:ui-monospace,Consolas,monospace;font-size:12px;resize:vertical}
+.field{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:700;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 22px}
+.step{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--navy);font-size:13px;margin-bottom:10px}
+.step b{width:24px;height:24px;border-radius:50%;background:var(--teal-l);color:var(--teal-d);display:grid;place-items:center;font-size:12px}
+.sec{margin-bottom:20px}
+.btn{font:inherit;font-weight:700;border:0;padding:11px 20px;border-radius:13px;cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s;font-size:14px}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;box-shadow:0 12px 22px -12px rgba(13,148,136,.95)}
+.btn.ghost{background:#fff;color:var(--teal-d);border:1px solid #cfe3e1}
+.btn.danger{background:#fff;color:var(--red);border:1px solid #fecaca;padding:8px 14px;font-size:13px}
+.btn.arm{background:var(--red);color:#fff;border:1px solid var(--red);padding:8px 14px;font-size:13px}
+.btn.sm{padding:8px 14px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c,var(--teal))}
+.k-v{font-size:26px;font-weight:800;color:var(--navy);letter-spacing:-.4px}
+.k-l{font-size:12px;color:var(--muted);font-weight:600;margin-top:3px}
+.bar{height:9px;background:#e6f0f0;border-radius:99px;overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#34d399);border-radius:99px}
+.table-wrap{overflow-x:auto;border-radius:16px;border:1px solid var(--line)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th{background:#f4faf9;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;text-align:left;padding:12px 14px;white-space:nowrap;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid #eef3f3;white-space:nowrap}
+tbody tr:hover td{background:#f9fcfc}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td a{color:var(--teal-d);font-weight:700;text-decoration:none;cursor:pointer}
+td a:hover{text-decoration:underline}
+tr.total td{background:linear-gradient(90deg,#e6f7f5,#f4fbfb);font-weight:800;color:var(--navy)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.p-pos{background:#ffedd5;color:#c2410c}
+.p-ok{background:#dcfce7;color:#15803d}
+.p-over{background:var(--red-l);color:#991b1b}
+.p-neutral{background:#eef2f7;color:var(--muted)}
+.p-teal{background:var(--teal-l);color:var(--teal-d)}
+.blocks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:14px;transition:transform .15s,box-shadow .15s}
+.bcard:hover{transform:translateY(-2px);box-shadow:0 18px 36px -16px rgba(15,39,71,.3)}
+.bcard-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.th-name{font:inherit;font-size:18px;font-weight:800;color:var(--navy);border:1px solid transparent;border-radius:10px;padding:4px 8px;background:transparent;width:150px;outline:none}
+.th-name:hover{border-color:#cfe3e1}
+.th-name:focus{border-color:var(--teal);background:#fff}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mini div{background:linear-gradient(180deg,#f7fcfb,#eef8f6);border:1px solid #e0f0ed;border-radius:14px;padding:10px 6px;text-align:center}
+.mini b{display:block;font-size:16px;color:var(--navy);font-variant-numeric:tabular-nums}
+.mini small{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.3px}
+.cfoot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;gap:8px;flex-wrap:wrap}
+.icards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.icard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.icard-h{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.icard-h b{font-size:14px;color:var(--navy)}
+.icard-h .pill{padding:2px 9px;font-size:11px}
+.ivil{display:flex;flex-direction:column;gap:2px}
+.irow{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:12px;border-top:1px dashed var(--line);padding-top:3px}
+.irow .vn{font-weight:700;color:var(--navy);min-width:48px}
+.isz{display:flex;flex-wrap:wrap;gap:2px 8px;color:var(--muted);font-variant-numeric:tabular-nums}
+.isz b{color:var(--navy)}
+.wlog{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:6px}
+.wrow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 9px;display:flex;flex-direction:column;gap:3px}
+.wrow-top{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12px}
+.wrow-top .pill{padding:2px 8px;font-size:11px}
+.wrow-top .wv{color:var(--navy);font-size:12px}
+.wrow-top .wc{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.wrow-top .wq{margin-left:auto;color:var(--navy);font-variant-numeric:tabular-nums}
+.wrow-bot{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.wrow-bot .note{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.wrow-bot .btn{padding:3px 9px;font-size:11px;flex-shrink:0}
+.wtotal{grid-column:1/-1;display:flex;justify-content:space-between;padding:8px 10px;border-radius:12px;background:var(--teal-l);color:var(--teal-d);font-size:13px}
+.wlog{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:5px}
+.wdate{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--muted);margin-top:4px}
+.wg{background:#fff;border:1px solid var(--line);border-radius:10px;padding:5px 7px;display:flex;flex-direction:column;gap:4px}
+.wg-h{display:flex;align-items:center;flex-wrap:wrap;gap:3px 5px;font-size:12px}
+.wg-h .pill{padding:1px 7px;font-size:10px}
+.wg-h .wv{color:var(--navy)}
+.wg-h .wq{margin-left:auto;color:var(--navy);font-variant-numeric:tabular-nums}
+.wg-e{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:2px;min-width:0;overflow:hidden}
+.went{display:inline-flex;align-items:center;gap:2px;font-size:11px;min-width:0}
+.went .core{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-size:8px;padding:0;margin:0;text-align:center;flex-shrink:0}
+.went .btn{min-height:0;padding:0 1px;margin:0;border:0;background:none;box-shadow:none;color:#dc2626;font-size:12px;line-height:1}
+.wtotal{grid-column:1/-1;display:flex;justify-content:space-between;padding:6px 10px;border-radius:10px;background:var(--teal-l);color:var(--teal-d);font-size:13px}
+.otiles{display:flex;justify-content:space-between;gap:4px;flex-wrap:nowrap}
+.otile{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.otile b{font-size:15px;color:var(--navy);font-variant-numeric:tabular-nums}
+.otile b.neg{color:#dc2626}
+.otile .note{font-size:10px;text-align:center}
+.otile .core{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0;font-size:9px;line-height:1}
+.wi-sz{display:flex;flex-direction:column;gap:6px;padding:8px 0;border-top:1px dashed var(--line)}
+.wi-h{display:flex;align-items:center;gap:8px;font-size:13px}
+.wi-cs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.wi-c{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wi-c .core{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0;font-size:9px;line-height:1}
+.wi-in{padding:6px 4px;text-align:center;font-size:14px}
+.wi-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ov-size{padding:5px 14px;font-size:16px;font-weight:800;letter-spacing:.2px}
+.vbtns{display:flex;flex-wrap:nowrap;gap:8px}
+.vbtn{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:16px;border:1px solid #cfe3e1;background:#fff;cursor:pointer;font:inherit;color:var(--navy);box-shadow:var(--shadow)}
+.vbtn b{font-size:20px;color:var(--vc);font-variant-numeric:tabular-nums;line-height:1.1}
+.vbtn span{font-size:11px;font-weight:700;color:var(--muted);text-align:center;white-space:nowrap}
+.vbtn.on{border-color:var(--vc);box-shadow:0 0 0 2px var(--vc) inset}
+.wdate-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wdate-row .btn{padding:3px 12px;font-size:12px}
+.wo-edit{width:64px;padding:3px 5px;font-size:13px;text-align:center}
+.del-row{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.del-row .del-in{width:120px;padding:4px 8px;font-size:12px}
+.del-row .btn{padding:4px 10px;font-size:12px;min-height:0}
+.undobar{display:flex;gap:8px;justify-content:flex-end;margin:0 0 10px}
+.undobar .btn:disabled{opacity:.45;cursor:default}
+.preview{margin-top:18px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#f0fbf9,#f7fafc);border:1px dashed #9fdcd5}
+.mixrow{display:flex;flex-wrap:wrap;gap:6px}
+details{margin-top:6px}
+summary{cursor:pointer;font-weight:700;color:var(--teal-d);padding:6px 0;outline:none}
+.empty{text-align:center;color:var(--muted);padding:28px;font-size:13px}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(10px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:999px;opacity:0;transition:all .25s;pointer-events:none;font-size:13px;font-weight:600;max-width:90vw;box-shadow:0 14px 30px -10px rgba(15,39,71,.6);z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.bad{background:var(--red)}
+footer{text-align:center;font-size:11px;color:var(--muted);padding:18px;letter-spacing:.3px}
+footer b{color:var(--teal-d)}
+.export-row{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 20px}
+.export-row .btn{min-width:180px}
+@media (max-width:720px){
+  header{padding:14px 16px}
+  header h1{font-size:15px}
+  header p{display:none}
+  .logo{width:36px;height:36px;border-radius:11px}
+  nav{padding:8px 10px}
+  nav button{padding:8px 13px;font-size:13px}
+  main{padding:14px 10px 40px}
+  .card{padding:16px;border-radius:16px;margin-bottom:14px}
+  .card-h{margin-bottom:12px}
+  .card-h h2{font-size:15px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:14px}
+  .k-v{font-size:19px}
+  .form-grid{grid-template-columns:1fr;gap:14px}
+  .blocks-grid{grid-template-columns:1fr;gap:14px}
+  .seg{display:flex;width:100%}
+  .seg button{flex:1;justify-content:center;padding:12px 10px;font-size:13px}
+  .chip{padding:10px 14px;min-height:40px}
+  .chip.sm{min-height:38px;padding:9px 13px}
+  .stepper button{width:44px;height:44px;font-size:22px}
+  .stepper input{width:70px;font-size:17px}
+  .stepper.sm button{width:38px;height:38px}
+  input.txt,select.txt,textarea.txt{font-size:16px;padding:12px}
+  .btn{padding:13px 18px;min-height:46px}
+  .btn.danger,.btn.arm{min-height:40px;padding:9px 14px}
+  .export-row .btn{width:100%;min-width:0}
+  .mini b{font-size:14px}
+  .mini div{padding:9px 4px}
+  .th-name{width:120px;font-size:16px}
+  td,th{padding:8px 9px;font-size:12px}
+  .table-wrap{border-radius:12px}
+  td:first-child,th:first-child{position:sticky;left:0;z-index:1;background:#fff}
+  th:first-child{background:#f4faf9}
+  tbody tr:hover td:first-child{background:#f9fcfc}
+  .toast{bottom:14px;font-size:12px;white-space:normal;width:90vw;text-align:center;border-radius:14px}
+  .bcard{padding:14px}
+  .preview{padding:12px}
+}
+
+.th-grid{display:grid;gap:12px}
+.th-card{border:1px solid #e0f0ed;border-radius:16px;background:#fff;overflow:hidden}
+.th-head{width:100%;font:inherit;border:0;background:linear-gradient(180deg,#f7fcfb,#eef8f6);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;cursor:pointer;text-align:left;color:var(--navy)}
+.th-head b{font-size:16px}
+.th-body{padding:8px 12px 12px;display:grid;gap:8px}
+.vrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border-radius:12px;background:#f8fbfb;border:1px solid #e6f1ef}
+.vtype{font-weight:700;color:var(--navy);font-size:13px}
+.vsz{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;flex:1;min-width:150px}
+.cores{display:inline-flex;gap:3px;flex-wrap:wrap;vertical-align:middle}
+.core{font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;line-height:1.3;box-shadow:inset 0 0 0 1px rgba(15,39,71,.15)}
+.crow{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:#f8fbfb;border:1px solid #e6f1ef}
+.cname{display:inline-flex;align-items:center;gap:8px;min-width:120px;font-weight:700;color:var(--navy);font-size:13px}
+.cval{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:84px}
+.cbal{min-width:90px}
+.tsize{border:1px solid #e6f1ef;border-radius:14px;padding:10px;background:#fbfdfd}
+.tsize-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tgrid-wrap{overflow-x:auto;padding:2px}
+.tgrid{display:grid;grid-template-columns:118px repeat(3,minmax(118px,1fr));gap:10px 10px;align-items:center;min-width:500px}
+.tgrid .stepper{padding:2px;gap:0;justify-self:start}
+.tgrid .stepper button{width:32px;height:32px;font-size:17px}
+.tgrid .stepper input{width:46px;font-size:14px}
+.tgrid .stepper .u{display:none}
+.tgrid .tot{font-size:13px;color:var(--navy);font-variant-numeric:tabular-nums}
+@media (max-width:720px){
+  .tgrid-wrap{overflow:visible}
+  .tgrid{grid-template-columns:50px repeat(3,minmax(0,1fr));min-width:0;gap:8px 6px}
+  .tgrid .cname{min-width:0;gap:0}
+  .tgrid .cname span:last-child{display:none}
+  .tgrid .stepper{padding:1px;justify-self:stretch}
+  .tgrid .stepper button{width:24px;height:30px;font-size:15px;border-radius:9px}
+  .tgrid .stepper input{width:0;flex:1;min-width:0;font-size:13px}
+}
+.blocks-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bcard.compact{padding:10px 12px;gap:6px;border-radius:14px}
+.bcard.compact .bcard-h .th-name{font-size:15px}
+.bcard.compact .bmix{font-size:12px;color:var(--navy);font-weight:600;line-height:1.4}
+.bcard.compact .bsz{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bcard.compact .bsz b{color:var(--navy)}
+.bcard.compact .cfoot{padding-top:6px;margin-top:0}
+.bcard.compact .cfoot .btn{padding:6px 12px;font-size:12px}
+.blocks-grid.compact{gap:8px}
+.bcard.compact{padding:7px 10px;gap:2px}
+.bcard.compact .bcard-h .th-name{font-size:14px;padding:2px 0}
+.bcard.compact .bcard-h .pill{padding:2px 9px;font-size:11px}
+.bcard.compact .bsz{gap:1px 8px;line-height:1.35}
+.bcard.compact .cfoot{padding-top:0;line-height:1.3}
+.bcard.compact .cfoot .note{font-size:11px}
+.who{display:flex;align-items:center;gap:8px;margin-left:auto;color:#fff;font-size:13px;font-weight:600;white-space:nowrap}
+.who .btn.ghost{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.5)}
+.whotxt{opacity:.9}
+.login{max-width:460px;margin:24px auto}
+@keyframes wblink{0%,100%{opacity:1}50%{opacity:.15}}
+.blink{animation:wblink 1s steps(2,start) infinite}
+@media (max-width:720px){ .who{font-size:12px;gap:6px} .who .whotxt{display:none} }
+.preview-card{border:2px solid #f97316}
+.notice{border:2px solid #0d9488;background:#f0fdfa}
+.notice-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.notice-list{margin:0;padding-left:18px;font-size:14px;display:grid;gap:4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">W</div>
+    <div>
+      <h1>Taormina Village-01 · Wire Issue Tracker</h1>
+      <p>Electrical store · cable issued by block and villa</p>
+    </div>
+  </div>
+  <span class="ver" id="ver"></span>
+  <span class="who" id="who"></span>
+</header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.0.0</footer>
+<div id="toast" class="toast"></div>
+
+<script>
+var APP_VERSION = '2.0.0';
+var KEY = 'taormina-wire-tracker-v2';
+var SIZES = ['2.5', '4', '6'];
+var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
+var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
+var CHANGELOG = [
+  { v: '2.0.0', d: '2026-11-14', t: 'Shared data. Every phone and computer now uses one shared store (Supabase, tables wt_*) and refreshes every 10 seconds. Accounts are kept on the server and passwords are stored as hashes, so they can no longer be shown; the admin resets them. Storekeeper previews each wire in or wire out and confirms it; a confirmed entry is saved and locked. Edits and deletes go to the admin for approval. Foreman requests stock out to a named person by TH, villa, size, colour and rolls; the storekeeper accepts and stock out is recorded automatically. New updates appear as notes and toasts, and the Overview shows requests and activity cards. Undo and redo are removed for shared data. Restoring an old backup file is switched off.' },
+  { v: '1.13.6', d: '2026-11-14', t: 'Undo and Redo buttons at the top of every page step back and forward through data changes (wire out, wire in, blocks, villa types, deletes and resets). The last 50 changes are kept for this browser session.' },
+  { v: '1.13.5', d: '2026-11-14', t: 'Every delete (wire out, wire in deliveries, blocks, villa types and users) asks you to type DELETE before it runs. Cancel keeps the item.' },
+  { v: '1.13.4', d: '2026-11-14', t: 'Wire Out log: each day heading has one Edit button. In edit mode the rolls of every entry on that day can be changed; Done closes edit mode.' },
+  { v: '1.13.3', d: '2026-11-14', t: 'Overview: the four summary cards are replaced by three buttons in one line: Total villas, Villas completed and Villas ongoing. Tap one to list its villas by TH. The wire required and issued totals are no longer shown at the top; each size card shows store stock and wire still to issue.' },
+  { v: '1.13.2', d: '2026-11-14', t: 'Overview: the wire size label (2.5, 4, 6 sqmm) is shown larger.' },
+  { v: '1.13.1', d: '2026-11-14', t: 'Overview: all wire sizes are shown together as stacked cards (2.5, then 4, then 6 sqmm). The size switch is removed.' },
+  { v: '1.13.0', d: '2026-11-14', t: 'Overview replaces the Report tab. A size switch (2.5, 4, 6 sqmm) shows each colour with the store stock and what is still to issue. Wire In (storekeeper, admin) records each delivery by date, colour and size; store stock = wire in minus wire out. The wire in log lists the deliveries. The header Log out button is made visible.' },
+  { v: '1.12.15', d: '2026-11-14', t: 'Wire Out log: the TH filter is hidden behind a dropdown button showing the current choice (All TH or a TH number). Tap it to open the TH list; picking a TH closes it.' },
+  { v: '1.12.14', d: '2026-11-14', t: 'Wire Out log: colour icons, numbers and delete marks are smaller, so all five colours fit inside each card.' },
+  { v: '1.12.13', d: '2026-11-14', t: 'Wire Out log: colours are listed in the order R, Y, B, BK, YG, all on one line. The colour letters are centred in their icons.' },
+  { v: '1.12.12', d: '2026-11-14', t: 'Wire Out log: entries are plain text, with no grey background or button outline. The delete mark is a plain red x.' },
+  { v: '1.12.11', d: '2026-11-14', t: 'Wire Out log: the date is shown once per day. Entries of the same TH, villa and wire size are grouped in one small card, with each colour as an icon and a thin delete button. Issued to and remarks are no longer shown in the log; they are kept in the hover tooltip of each entry on a computer.' },
+  { v: '1.12.10', d: '2026-11-14', t: 'Wire Out log: the table is replaced by compact entry cards (TH, villa, size, colour, rolls on top; number, date, issued to and delete below). The total stays at the end.' },
+  { v: '1.12.9', d: '2026-11-14', t: 'Wire Out: villa buttons are filled with colour by their status. Green = complete, orange = ongoing, red = over-issued. Selected villas keep the same colour.' },
+  { v: '1.12.8', d: '2026-11-14', t: 'Reports: the issue preview is now small cards, one per TH and day. Each card lists the villas with their rolls per wire size, so date and TH are no longer repeated on every row. The PDF and Excel exports are unchanged.' },
+  { v: '1.12.7', d: '2026-11-14', t: 'Blocks & villas: TH cards are shorter, with tighter padding, spacing and text.' },
+  { v: '1.12.6', d: '2026-11-14', t: 'Wire Out: TH numbers are coloured by their wire status. Green = complete, orange = ongoing, red = more wire issued than required. The same colours show on the TH in the Wire Out log.' },
+  { v: '1.12.5', d: '2026-11-14', t: 'Blocks & villas: cards show only the TH number. Sub-blocks (B1, B2 ...) are combined into one card per TH with the total villas, villa types and rolls.' },
+  { v: '1.12.4', d: '2026-11-14', t: 'Backup & log: the reset downloads a full JSON backup of all data before clearing the issued wire quantities.' },
+  { v: '1.12.3', d: '2026-11-14', t: 'Backup & log: the reset now only clears the issued wire quantities to zero. Blocks, villa types and their requirements are kept as they are; the card is renamed Reset issued wire to zero.' },
+  { v: '1.12.2', d: '2026-11-14', t: 'Access control: each user card has an eye button that shows the password the admin issued. Passwords are now also stored in plain text in this browser (so the admin can read them); users created before this version show Not stored until their password is set again.' },
+  { v: '1.12.1', d: '2026-11-14', t: 'Blocks & villas: block cards are now half width and sit in two columns on phone and desktop.' },
+  { v: '1.12.0', d: '2026-11-14', t: 'Sign-in and access control. The first start creates the admin account. Admin adds users with a username, password and role: Storekeeper (issues wire, sees reports), Foreman and Chargehand (reports, with blinking Wire pending alerts on TH numbers that still need wire), Engineer (sees everything, changes nothing), or Admin. Passwords are stored as salted SHA-256 hashes in this browser only.' },
+  { v: '1.11.0', d: '2026-11-14', t: 'Wire Out: several wire sizes can be picked at once (tap 2.5, 4 and 6 sqmm). Each selected size shows its five colours, and one Record issue writes every size and colour selected. Custom rolls are set per size and colour.' },
+  { v: '1.10.4', d: '2026-11-14', t: 'The Wire issues tab is renamed Wire Out.' },
+  { v: '1.10.3', d: '2026-11-14', t: 'Blocks & villas: the "Import many blocks at once" section is removed.' },
+  { v: '1.10.2', d: '2026-11-14', t: 'Blocks & villas: the Remove button is removed from block cards.' },
+  { v: '1.10.1', d: '2026-11-14', t: 'Blocks & villas: block cards are compact. Villa types are shown as a single line, the +/− steppers are removed (counts are read-only here), and size totals sit on one line.' },
+  { v: '1.10.0', d: '2026-11-14', t: 'Reports tab works by TH number: the scope picker lists TH numbers, and the day totals, status and issue sheets, PDF/Excel titles and file names show TH only. Villas in reports are numbered continuously within each TH.' },
+  { v: '1.9.4', d: '2026-11-14', t: 'Villa types grid fits the phone width: smaller stepper buttons, colour chips without names on phones, and the three size columns share the screen width.' },
+  { v: '1.9.3', d: '2026-11-14', t: 'Villa types: each villa type is one card. Colours run down the left edge and 2.5, 4 and 6 sqmm are three columns side by side, with a total per villa at the foot.' },
+  { v: '1.9.2', d: '2026-11-14', t: 'Blocks & villas: the New block form is removed. The block list is unchanged.' },
+  { v: '1.9.1', d: '2026-11-14', t: 'Roll quantities: the + and − buttons move in whole rolls, and typed values are accepted only in half-roll steps (1, 1.5, 2, 2.5 …).' },
+  { v: '1.9.0', d: '2026-11-14', t: 'Villa types: the add form is removed; each size now has a requirement per core colour (R, Y, B, BK, YG), and the size total is their sum. Issues carry a colour: the form lists every colour for the chosen size with required, issued and balance, and the issue log shows the colour. Earlier numeric type requirements are reset to 0 per colour.' },
+  { v: '1.8.0', d: '2026-11-14', t: 'Wire core colours shown beside each wire size: R Red, Y Yellow, B Blue, BK Black, YG Yellow Green (full name on hover). Shown in the issue size selector, the issue log and the villa-type wire rows.' },
+  { v: '1.7.0', d: '2026-11-14', t: 'Report tab: the block-wise summary is replaced by a list of issued TH numbers, each green (complete) or orange (ongoing), red if over-issued. Tap a TH to see its villas, each marked complete (green) or partial (orange).' },
+  { v: '1.6.1', d: '2026-11-14', t: 'New block form starts empty (no pre-filled TH name) and has a Clear button to reset it.' },
+  { v: '1.6.0', d: '2026-11-14', t: 'Wire issues are recorded by TH number only. Pick a TH, tap one or more villas (sub-blocks grouped under the TH), then issue each villa\'s required wire (required minus already issued) or a custom roll count per villa. Issue log filters and shows TH numbers.' },
+  { v: '1.5.0', d: '2026-11-14', t: 'All quantities are now in rolls: villa-type requirements (rolls per villa), issues, balances, reports and exports. Metre figures and the roll-length setting are removed. Earlier metre-only test entries are dropped.' },
+  { v: '1.4.0', d: '2026-11-14', t: 'Wire is now recorded in rolls. Each issue is entered as a number of rolls, and metres are calculated from the roll length set per size in Data (default 100 m, to be confirmed). Balances, reports and exports show rolls and metres. Earlier metre entries are converted to rolls automatically.' },
+  { v: '1.3.0', d: '2026-11-14', t: 'Mobile-optimised layout (bottom-friendly tap targets, single-column forms, sticky first column in tables). New Reports tab: Daily report (issues on a chosen day, day totals, status at that date) and Until now (balance status and issue log up to a chosen date), for all blocks or one block. Download as PDF (A4) or Excel (.xlsx).' },
+  { v: '1.2.1', d: '2026-11-14', t: 'Balance colours: complete = green, ongoing (partly issued) = orange, not started = grey, over-issued = red. Legend updated.' },
+  { v: '1.2.0', d: '2026-11-14', t: 'Village-01 data loaded from the villas-per-block drawing (9 Nov 2026) and the TH details workbook: 55 blocks (TH-R01 to TH-R33, sub-blocks B1 to B6), 530 villas. Blocks can hold more than one villa type (16 sub-blocks in TH-R07, R08, R09, R16 and R17 mix 4BR-LUX and 5BR-LUX). Block cards use type steppers. Storage key changed to v2, so the v1.1 test entries are not carried over.' },
+  { v: '1.1.0', d: '2026-11-14', t: 'New theme. Block picker chips, wire-size buttons (2.5 / 4 / 6 sqmm), quantity steppers for villas, metres and villa numbers, block cards, villa-type cards with per-size steppers, colour-coded balances and issued progress.' },
+  { v: '1.0.0', d: '2026-11-14', t: 'First release: villa-type wire database, block and villa register, wire issue log, report overall / block-wise / villa-wise, CSV and JSON import and export.' }
+];
+
+/* Village-01 blocks: from the Villas per Block drawing (9 Nov 2026) and the TH details workbook. Mix = villas per type. */
+var SEED_TYPES = ['3BR', '4BR', '4BR-LUX', '5BR-LUX', '4BR-STDALN'];
+var SEED_BLOCKS = [
+  { block: 'TH-R01', mix: { '3BR': 18 } },
+  { block: 'TH-R02 B1', mix: { '3BR': 14 } },
+  { block: 'TH-R02 B2', mix: { '3BR': 12 } },
+  { block: 'TH-R03', mix: { '3BR': 14 } },
+  { block: 'TH-R04', mix: { '3BR': 18 } },
+  { block: 'TH-R05 B1', mix: { '3BR': 14 } },
+  { block: 'TH-R05 B2', mix: { '3BR': 14 } },
+  { block: 'TH-R06 B1', mix: { '3BR': 14 } },
+  { block: 'TH-R06 B2', mix: { '3BR': 14 } },
+  { block: 'TH-R07 B1', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R07 B2', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R07 B3', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R07 B4', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R08 B1', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R08 B2', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R08 B3', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R08 B4', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R09 B1', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R09 B2', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R09 B3', mix: { '5BR-LUX': 2 } },
+  { block: 'TH-R09 B4', mix: { '4BR-STDALN': 1 } },
+  { block: 'TH-R10', mix: { '3BR': 20 } },
+  { block: 'TH-R11', mix: { '3BR': 18 } },
+  { block: 'TH-R12', mix: { '3BR': 10 } },
+  { block: 'TH-R13', mix: { '3BR': 14 } },
+  { block: 'TH-R14', mix: { '3BR': 18 } },
+  { block: 'TH-R15 B1', mix: { '4BR': 12 } },
+  { block: 'TH-R15 B2', mix: { '4BR': 14 } },
+  { block: 'TH-R16', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B1', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B2', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B3', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B4', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B5', mix: { '4BR-LUX': 1, '5BR-LUX': 2 } },
+  { block: 'TH-R17 B6', mix: { '4BR-STDALN': 1 } },
+  { block: 'TH-R18', mix: { '3BR': 4 } },
+  { block: 'TH-R19', mix: { '3BR': 18 } },
+  { block: 'TH-R20', mix: { '3BR': 18 } },
+  { block: 'TH-R21', mix: { '3BR': 6 } },
+  { block: 'TH-R22', mix: { '3BR': 10 } },
+  { block: 'TH-R23', mix: { '3BR': 12 } },
+  { block: 'TH-R24', mix: { '3BR': 10 } },
+  { block: 'TH-R25 B1', mix: { '4BR': 12 } },
+  { block: 'TH-R25 B2', mix: { '4BR': 14 } },
+  { block: 'TH-R26', mix: { '3BR': 14 } },
+  { block: 'TH-R27', mix: { '3BR': 6 } },
+  { block: 'TH-R28', mix: { '3BR': 8 } },
+  { block: 'TH-R29', mix: { '3BR': 18 } },
+  { block: 'TH-R30', mix: { '3BR': 18 } },
+  { block: 'TH-R31 B1', mix: { '3BR': 14 } },
+  { block: 'TH-R31 B2', mix: { '3BR': 12 } },
+  { block: 'TH-R32 B1', mix: { '4BR': 10 } },
+  { block: 'TH-R32 B2', mix: { '4BR': 14 } },
+  { block: 'TH-R33 B1', mix: { '4BR': 10 } },
+  { block: 'TH-R33 B2', mix: { '3BR': 12 } }
+];
+
+var S = null;
+var tab = 'report';
+var ui = { scope: '', fTH: '', openTh: {}, rKind: 'daily', rDate: '', rScope: '' };
+var draft = { date: '', th: '', picks: [], sizes: ['2.5'], mode: 'req', cr: { '2.5': { R: 0, Y: 0, B: 0, BK: 0, YG: 0 }, '4': { R: 0, Y: 0, B: 0, BK: 0, YG: 0 }, '6': { R: 0, Y: 0, B: 0, BK: 0, YG: 0 } }, to: '', remarks: '' };
+var bdraft = { name: '', mix: {} };
+var tdraft = { name: '', w: { '2.5': 0, '4': 0, '6': 0 } };
+var pendingImport = null;
+var toastT = null;
+
+/* ---------- helpers ---------- */
+function $(id) { return document.getElementById(id); }
+function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function fmt(n) { return (Math.round(n * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+function csvNum(n) { return String(Math.round(n * 100) / 100); }
+function localDate() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function flat(a) { return a.reduce(function (x, y) { return x.concat(y); }, []); }
+
+function el(tag, attrs, kids) {
+  var e = document.createElement(tag);
+  if (attrs) {
+    for (var k in attrs) {
+      if (!attrs.hasOwnProperty(k)) continue;
+      var v = attrs[k];
+      if (v === null || v === undefined || v === false) continue;
+      if (k === 'text') e.textContent = v;
+      else if (k === 'class') e.className = v;
+      else if (k.indexOf('on') === 0) e.addEventListener(k.slice(2), v);
+      else if (v === true) e.setAttribute(k, '');
+      else e.setAttribute(k, String(v));
+    }
+  }
+  (kids || []).forEach(function (c) {
+    if (c === null || c === undefined || c === false) return;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return e;
+}
+function td(c, cls) { return el('td', { class: cls || null }, [c]); }
+function th(c, cls) { return el('th', { class: cls || null }, [c]); }
+function opt(v, label, selected) { return el('option', { value: v, text: label, selected: selected ? true : null }); }
+function field(label, node) { return el('label', { class: 'field' }, [el('span', { text: label }), node]); }
+function step(n, label) { return el('div', { class: 'step' }, [el('b', { text: String(n) }), el('span', { text: label })]); }
+function chip(label, on, onClick, sm) {
+  return el('button', { class: 'chip' + (on ? ' on' : '') + (sm ? ' sm' : ''), text: label, onclick: onClick });
+}
+function sizeDot(sz) { return el('span', { class: 'dot', style: 'background:' + SIZE_COLOR[sz] }); }
+/* core colours of the wire: short name shown, full name on hover */
+var CORE_COLORS = [
+  { s: 'R', n: 'Red', bg: '#dc2626', fg: '#fff' },
+  { s: 'Y', n: 'Yellow', bg: '#facc15', fg: '#1f2937' },
+  { s: 'B', n: 'Blue', bg: '#2563eb', fg: '#fff' },
+  { s: 'BK', n: 'Black', bg: '#111827', fg: '#fff' },
+  { s: 'YG', n: 'Yellow Green', bg: '#a3e635', fg: '#1f2937' }
+];
+function coreStrip() {
+  return el('span', { class: 'cores', title: CORE_COLORS.map(function (c) { return c.n; }).join(', ') },
+    CORE_COLORS.map(function (c) { return el('span', { class: 'core', title: c.n, style: 'background:' + c.bg + ';color:' + c.fg, text: c.s }); }));
+}
+
+function stepper(val, stepSize, min, max, onChange, unit, small) {
+  var clamp = function (v) {
+    v = Math.max(min, v);
+    if (max !== null && max !== undefined) v = Math.min(max, v);
+    if (unit === 'rolls') return Math.round(v * 2) / 2;   /* rolls: whole or half only */
+    return Math.round(v * 100) / 100;
+  };
+  var inp = el('input', { type: 'number', step: unit === 'rolls' ? '0.5' : String(stepSize), min: String(min), value: String(val),
+    onchange: function () { onChange(clamp(num(this.value))); } });
+  var kids = [
+    el('button', { text: '−', onclick: function () { onChange(clamp(val - stepSize)); } }),
+    inp,
+    el('button', { text: '+', onclick: function () { onChange(clamp(val + stepSize)); } })
+  ];
+  if (unit) kids.push(el('span', { class: 'u', text: unit }));
+  return el('div', { class: 'stepper' + (small ? ' sm' : '') }, kids);
+}
+
+function toast(msg, bad) {
+  var t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (bad ? ' bad' : '');
+  clearTimeout(toastT);
+  toastT = setTimeout(function () { t.className = 'toast'; }, 2800);
+}
+
+/* every delete asks for the word DELETE before it runs */
+function armBtn(label, onConfirm) {
+  var b = el('button', { class: 'btn danger', text: label });
+  b.addEventListener('click', function () {
+    var row = null;
+    var inp = el('input', { type: 'text', class: 'txt del-in', placeholder: 'Type DELETE' });
+    var ok = el('button', { class: 'btn danger sm', text: 'Confirm', onclick: function () {
+      if (inp.value.trim() !== 'DELETE') { toast('Type DELETE to confirm', true); return; }
+      onConfirm();
+    } });
+    var no = el('button', { class: 'btn ghost sm', text: 'Cancel', onclick: function () {
+      if (row && row.parentNode) row.parentNode.replaceChild(b, row);
+    } });
+    row = el('span', { class: 'del-row' }, [inp, ok, no]);
+    if (b.parentNode) b.parentNode.replaceChild(row, b);
+  });
+  return b;
+}
+
+function download(name, text, mime) {
+  var blob = (text instanceof Blob) ? text : new Blob([text], { type: mime });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+/* ---------- shared data: Supabase (tables wt_*; every change goes through server functions) ---------- */
+var API_URL = 'https://pbsrxlkdsxaydmqgoazi.supabase.co';
+var API_KEY = 'sb_publishable_e3N7s4T6nC35gtS9EnfCCA_GxgRpis7';
+var TOKEN_KEY = 'taormina-wire-token-v2';
+var IMPORT_KEY = 'taormina-wire-imported-v2';
+var SRV = {
+  booted: false, hasUsers: true, token: null, version: 0, fp: '',
+  users: [], entries: [], changes: [], stock: [],
+  known: null, notes: [], unseen: 0, busy: false, pending: 0, chain: Promise.resolve()
+};
+
+function rpc(name, body) {
+  return fetch(API_URL + '/rest/v1/rpc/' + name, {
+    method: 'POST',
+    headers: { 'apikey': API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {})
+  }).then(function (res) {
+    return res.text().then(function (txt) {
+      var j = null;
+      try { j = txt ? JSON.parse(txt) : null; } catch (e) { j = null; }
+      if (!res.ok) throw new Error((j && (j.message || j.hint)) || ('Server error ' + res.status));
+      return j;
+    });
+  }, function (err) { throw new Error('No connection to the shared store (' + (err && err.message ? err.message : 'request blocked') + ' · ' + API_URL + ')'); });
+}
+
+function seed() {
+  var types = SEED_TYPES.map(function (n) { return { name: n, w: zeroW() }; });
+  var blocks = SEED_BLOCKS.map(function (b) { return { block: b.block, mix: JSON.parse(JSON.stringify(b.mix)) }; });
+  return { types: types, blocks: blocks, issues: [], receipts: [], nextId: 1 };
+}
+function validData(o) { return !!o && Array.isArray(o.types) && Array.isArray(o.blocks) && Array.isArray(o.issues); }
+/* records kept by the old single-browser version, if this browser still has them */
+function localOld() {
+  try { var raw = localStorage.getItem(KEY); var o = raw ? JSON.parse(raw) : null; return validData(o) ? o : null; } catch (e) { return null; }
+}
+function emptyS() { return { types: [], blocks: [], issues: [], receipts: [], nextId: 1 }; }
+var S = emptyS();
+
+/* the server copy becomes S: structure (blocks, villa types) plus every saved entry */
+function applyState(g) {
+  var st = g.state || {};
+  var d = st.data || {};
+  var hasStruct = Array.isArray(d.types) && Array.isArray(d.blocks);
+  SRV.version = Number(st.version) || 0;
+  me = { u: g.username, role: g.role };
+  if (SRV.pending === 0) {
+    S.types = hasStruct ? d.types : [];
+    S.blocks = hasStruct ? d.blocks : [];
+  }
+  var issues = [], receipts = [];
+  (g.entries || []).forEach(function (e) {
+    if (e.kind === 'in') receipts.push({ id: e.id, date: e.entry_date, ref: e.ref || '', lines: e.lines || {}, remarks: e.remarks || '', by: e.created_by || '' });
+    else issues.push({ id: e.id, date: e.entry_date, block: e.block, villa: e.villa === null ? '' : e.villa, size: e.size, colour: e.colour,
+      rolls: num(e.rolls), to: e.to_name || '', remarks: e.remarks || '', ref: e.ref || '', by: e.created_by || '' });
+  });
+  S.issues = issues; S.receipts = receipts;
+  migrate(S);
+  SRV.entries = g.entries || [];
+  SRV.changes = g.changes || [];
+  SRV.stock = g.stock_requests || [];
+  SRV.fp = JSON.stringify(g);
+}
+
+/* structure edits (blocks, villa types) are pushed one at a time, each checked against the version it was made on */
+function pushStructure() {
+  SRV.pending++;
+  var job = SRV.chain.then(function () {
+    return rpc('wt_save_structure', { p_token: SRV.token, p_data: { types: S.types, blocks: S.blocks }, p_version: SRV.version })
+      .then(function (nv) { SRV.version = Number(nv) || SRV.version + 1; });
+  });
+  SRV.chain = job.then(function () { SRV.pending--; }, function (err) {
+    SRV.pending--;
+    toast(err.message, true);
+    return refresh(true).then(function () { render(); });
+  });
+  return SRV.chain;
+}
+/* called by Blocks and Villa types after every edit */
+function save() {
+  if (!SRV.token) return;
+  if (me.role !== 'admin') { toast('Only admin can change blocks and villa types', true); return; }
+  pushStructure();
+}
+/* first admin sign-in on an empty store: use this browser's old blocks if any, otherwise the seed */
+function ensureStructure(g) {
+  var d = (g.state && g.state.data) || {};
+  if (me.role !== 'admin' || (Array.isArray(d.types) && Array.isArray(d.blocks))) return Promise.resolve();
+  var old = localOld();
+  var base = old ? { types: old.types, blocks: old.blocks } : { types: seed().types, blocks: seed().blocks };
+  S.types = base.types; S.blocks = base.blocks; migrate(S);
+  return pushStructure();
+}
+
+function refresh(silent) {
+  if (!SRV.token) return Promise.resolve(false);
+  var before = SRV.fp;
+  return rpc('wt_get_state', { p_token: SRV.token }).then(function (g) {
+    applyState(g);
+    var users = me.role === 'admin'
+      ? rpc('wt_list_users', { p_token: SRV.token }).then(function (u) { SRV.users = u || []; })
+      : Promise.resolve();
+    return users.then(function () { return ensureStructure(g); }).then(function () {
+      if (SRV.booted) notifyNew();
+      return SRV.fp !== before;
+    });
+  }).catch(function (err) {
+    if (/Sign in first/i.test(err.message)) { signedOut(); return true; }
+    if (!silent) toast(err.message, true);
+    return false;
+  });
+}
+
+/* run one server action, then reload the shared copy */
+function act(fn) {
+  if (SRV.busy) return;
+  SRV.busy = true;
+  Promise.resolve().then(fn).then(function () { return refresh(true); })
+    .catch(function (err) { toast(err.message, true); })
+    .then(function () { SRV.busy = false; render(); });
+}
+
+/* new items made by other people (and decisions on my own requests) become notes and toasts */
+function notifyNew() {
+  var now = {};
+  SRV.entries.forEach(function (e) { now['e' + e.id] = 1; });
+  SRV.changes.forEach(function (c) { now['c' + c.id + c.status] = 1; });
+  SRV.stock.forEach(function (s) { now['s' + s.id + s.status] = 1; });
+  var prev = SRV.known;
+  SRV.known = now;
+  if (!prev || !me) return;
+  var notes = [], grp = {}, order = [];
+  SRV.entries.forEach(function (e) {
+    if (prev['e' + e.id] || e.created_by === me.u) return;
+    var k = e.kind + '|' + e.created_by;
+    if (!grp[k]) { grp[k] = { kind: e.kind, by: e.created_by, n: 0, ths: {} }; order.push(k); }
+    grp[k].n++;
+    if (e.block) grp[k].ths[thOf(e.block)] = true;
+  });
+  order.forEach(function (k) {
+    var g = grp[k], ths = Object.keys(g.ths).join(', ');
+    notes.push(g.kind === 'in'
+      ? 'New wire in by ' + g.by + ' · ' + g.n + ' deliver' + (g.n === 1 ? 'y' : 'ies')
+      : 'New wire out by ' + g.by + ' · ' + g.n + ' line' + (g.n === 1 ? '' : 's') + (ths ? ' · ' + ths : ''));
+  });
+  SRV.stock.forEach(function (s) {
+    if (prev['s' + s.id + s.status]) return;
+    if (s.status === 'pending' && canWriteStore() && s.requested_by !== me.u)
+      notes.push('Stock-out request from ' + s.requested_by + ' for ' + s.to_name + ' · ' + (s.items || []).length + ' lines');
+    if (s.status !== 'pending' && s.requested_by === me.u)
+      notes.push('Your stock-out request for ' + s.to_name + ' was ' + s.status);
+  });
+  SRV.changes.forEach(function (c) {
+    if (prev['c' + c.id + c.status]) return;
+    if (c.status === 'pending' && me.role === 'admin' && c.requested_by !== me.u)
+      notes.push('Change request from ' + c.requested_by + ' · ' + (c.action === 'delete' ? 'delete an entry' : 'change to ' + fmt(round2(num(c.new_rolls))) + ' rolls'));
+    if (c.status !== 'pending' && c.requested_by === me.u)
+      notes.push('Your change request was ' + c.status);
+  });
+  if (notes.length) {
+    SRV.notes = notes.concat(SRV.notes).slice(0, 10);
+    SRV.unseen += notes.length;
+    toast(notes[0] + (notes.length > 1 ? '  (+' + (notes.length - 1) + ' more)' : ''));
+  }
+}
+
+function startPolling() {
+  setInterval(function () {
+    if (!SRV.token || SRV.busy || SRV.pending > 0) return;
+    var a = document.activeElement;
+    if (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)) return;
+    refresh(true).then(function (changed) { if (changed) render(); });
+  }, 10000);
+}
+
+function signedOut() {
+  SRV.token = null; me = null; SRV.notes = []; SRV.known = null; SRV.unseen = 0;
+  try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+}
+function startSession(token) {
+  SRV.token = token; SRV.known = null;
+  try { sessionStorage.setItem(TOKEN_KEY, token); } catch (e) {}
+  return refresh(false).then(function () { render(); });
+}
+function logout() {
+  var t = SRV.token;
+  if (t) rpc('wt_logout', { p_token: t }).catch(function () {});
+  signedOut(); tab = 'report'; render();
+}
+function boot() {
+  var t = null;
+  try { t = sessionStorage.getItem(TOKEN_KEY); } catch (e) {}
+  rpc('wt_has_users', {}).then(function (h) {
+    SRV.hasUsers = !!h;
+    if (!t) return;
+    SRV.token = t;
+    return refresh(false).then(function () { if (!me) SRV.token = null; });
+  }).catch(function (err) {
+    toast('Cannot reach the shared store: ' + err.message, true);
+  }).then(function () {
+    SRV.booted = true;
+    render();
+    startPolling();
+  });
+}
+
+
+/* ---------- lookups and calculations ---------- */
+function typeOf(n) { for (var i = 0; i < S.types.length; i++) if (S.types[i].name === n) return S.types[i]; return null; }
+function blockOf(n) { for (var i = 0; i < S.blocks.length; i++) if (S.blocks[i].block === n) return S.blocks[i]; return null; }
+function mixOf(b) { return b.mix || {}; }
+function mixEntries(b) {
+  return Object.keys(mixOf(b)).map(function (t) { return { type: t, n: Math.max(0, Math.floor(num(mixOf(b)[t]))) }; })
+    .filter(function (e) { return e.n > 0; });
+}
+/* requirement per villa type: rolls per size, per core colour (w[size][colour]) */
+function zeroCr() { return { R: 0, Y: 0, B: 0, BK: 0, YG: 0 }; }
+function zeroW() { var w = {}; SIZES.forEach(function (sz) { w[sz] = zeroCr(); }); return w; }
+function villaReqC(tn, sz, c) { var t = typeOf(tn); return t && t.w && t.w[sz] ? num(t.w[sz][c]) : 0; }
+function villaReq(tn, sz) {
+  var t = typeOf(tn); if (!t || !t.w || !t.w[sz]) return 0;
+  return CORE_COLORS.reduce(function (s, c) { return s + num(t.w[sz][c.s]); }, 0);
+}
+function villasIn(b) { return mixEntries(b).reduce(function (s, e) { return s + e.n; }, 0); }
+function blockReq(b, sz) { return mixEntries(b).reduce(function (s, e) { return s + villaReq(e.type, sz) * e.n; }, 0); }
+/* villa type of villa number v (1-based), following the block's mix order */
+function typeAt(b, v) {
+  var c = 0, list = mixEntries(b);
+  for (var i = 0; i < list.length; i++) { c += list[i].n; if (v <= c) return list[i].type; }
+  return '';
+}
+function mixText(b) { return mixEntries(b).map(function (e) { return e.type + ' × ' + e.n; }).join(' · '); }
+
+/* villa: undefined = whole block; '' = not tied to a villa; number = that villa */
+function issued(block, sz, villa, asOf, colour) {
+  var s = 0;
+  S.issues.forEach(function (i) {
+    if (i.block !== block || String(i.size) !== sz) return;
+    if (colour !== undefined && i.colour !== colour) return;
+    if (asOf && i.date > asOf) return;
+    if (villa !== undefined) {
+      var iv = (i.villa === '' || i.villa === null || i.villa === undefined) ? '' : Number(i.villa);
+      if (iv !== villa) return;
+    }
+    s += iR(i);
+  });
+  return s;
+}
+function issuedAll(sz, asOf) {
+  var s = 0;
+  S.issues.forEach(function (i) { if (String(i.size) === sz && !(asOf && i.date > asOf)) s += iR(i); });
+  return s;
+}
+
+/* ---- quantities are in rolls ---- */
+function iR(i) { return num(i.rolls); }
+function migrate(D) {
+  if (!D.nextId) D.nextId = 1;
+  (D.types || []).forEach(function (t) {
+    t.w = t.w || {};
+    SIZES.forEach(function (sz) { if (!t.w[sz] || typeof t.w[sz] !== 'object') t.w[sz] = zeroCr(); });
+  });
+  D.issues = D.issues.filter(function (i) { return i.rolls !== undefined; });
+  if (!Array.isArray(D.receipts)) D.receipts = [];
+}
+
+function balPill(req, iss) {
+  var b = req - iss;
+  if (Math.abs(req) < 1e-9 && Math.abs(iss) < 1e-9) return el('span', { class: 'pill p-neutral', text: '–' });
+  if (b < -1e-9) return el('span', { class: 'pill p-over', text: fmt(-b) + ' over' });
+  if (Math.abs(b) <= 1e-9) return el('span', { class: 'pill p-ok', text: 'Complete' });
+  if (iss <= 1e-9) return el('span', { class: 'pill p-neutral', text: 'Not started · ' + fmt(b) + ' rolls' });
+  return el('span', { class: 'pill p-pos', text: 'Ongoing · ' + fmt(b) + ' rolls left' });
+}
+function balTd(req, iss) { return td(balPill(req, iss), 'num'); }
+
+function thead(firstLabels) {
+  var h1 = el('tr', {}, firstLabels.map(function (l) { return el('th', { text: l, rowspan: '2' }); })
+    .concat(SIZES.map(function (sz) { return el('th', { class: 'num', colspan: '3', text: sz + ' sqmm (rolls)' }); })));
+  var h2 = el('tr', {}, flat(SIZES.map(function () { return [th('Req', 'num'), th('Issued', 'num'), th('Balance', 'num')]; })));
+  return el('thead', {}, [h1, h2]);
+}
+
+/* ---------- REPORT ---------- */
+/* ---- store: wire in (deliveries) minus wire out (issues) ---- */
+var wiDraft = null;
+var ovSize = '2.5';
+function wiNew() { return { date: localDate(), ref: '', lines: {}, remarks: '' }; }
+function reqColour(sz, c) {
+  var s = 0;
+  S.blocks.forEach(function (b) { for (var v = 1; v <= villasIn(b); v++) s += villaReqC(typeAt(b, v), sz, c); });
+  return s;
+}
+function issuedColour(sz, c) { var s = 0; S.issues.forEach(function (i) { if (String(i.size) === sz && i.colour === c) s += iR(i); }); return s; }
+function receivedColour(sz, c) {
+  var s = 0;
+  (S.receipts || []).forEach(function (r) { var l = r.lines && r.lines[sz]; if (l) s += num(l[c]); });
+  return s;
+}
+function storeColour(sz, c) { return receivedColour(sz, c) - issuedColour(sz, c); }
+function canWireIn() { return permFor('wirein') === 'edit'; }
+
+/* Overview: every wire size stacked as its own card, with each colour's store stock and what is still to issue */
+function ovSizeBlock(sz) {
+  var sc = SIZE_COLOR[sz];
+  var stock = 0, toIssue = 0;
+  var tiles = CORE_COLORS.map(function (c) {
+    var st = storeColour(sz, c.s), tb = reqColour(sz, c.s) - issuedColour(sz, c.s);
+    stock += st; toIssue += tb;
+    return el('div', { class: 'otile' }, [
+      coreChip(c),
+      el('b', { class: st < -1e-9 ? 'neg' : null, text: fmt(round2(st)) }),
+      el('span', { class: 'note', text: 'to issue ' + fmt(round2(tb)) })
+    ]);
+  });
+  return el('div', { class: 'wg', style: 'border-left:4px solid ' + sc }, [
+    el('div', { class: 'wg-h' }, [
+      el('span', { class: 'pill ov-size', style: 'background:' + sc + '22;color:' + sc, text: sz + ' sqmm' }),
+      el('span', { class: 'note', text: 'Store ' + fmt(round2(stock)) + ' rolls · to issue ' + fmt(round2(toIssue)) })
+    ]),
+    el('div', { class: 'otiles' }, tiles)
+  ]);
+}
+function ovSizeCard() {
+  return el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [
+      el('div', {}, [el('span', { class: 'eyebrow', text: 'Store' }), el('h2', { text: 'Wire balance by size' })]),
+      canWireIn() ? el('button', { class: 'btn primary sm', text: wiOpen ? 'Close' : '+ Wire In', onclick: function () { wiOpen = !wiOpen; render(); } }) : null
+    ]),
+    el('div', { style: 'display:grid;gap:8px' }, SIZES.map(ovSizeBlock))
+  ]);
+}
+
+var wiOpen = false;
+function wiForm() {
+  var d = wiDraft || (wiDraft = wiNew());
+  var dateIn = el('input', { type: 'date', class: 'txt', value: d.date, onchange: function () { d.date = this.value || localDate(); } });
+  var refIn = el('input', { type: 'text', class: 'txt', placeholder: 'Delivery note / supplier', value: d.ref, onchange: function () { d.ref = this.value; } });
+  var remIn = el('input', { type: 'text', class: 'txt', placeholder: 'Remarks (optional)', value: d.remarks, onchange: function () { d.remarks = this.value; } });
+  var sizeRows = SIZES.map(function (sz) {
+    return el('div', { class: 'wi-sz' }, [
+      el('div', { class: 'wi-h' }, [sizeDot(sz), el('b', { text: sz + ' sqmm' })]),
+      el('div', { class: 'wi-cs' }, CORE_COLORS.map(function (c) {
+        var cur = d.lines[sz] && d.lines[sz][c.s] !== undefined ? d.lines[sz][c.s] : '';
+        return el('label', { class: 'wi-c' }, [
+          coreChip(c),
+          el('input', { type: 'number', class: 'txt wi-in', min: '0', step: '0.5', placeholder: '0', value: cur, onchange: function () {
+            var q = Math.max(0, Math.round((Number(this.value) || 0) * 2) / 2);
+            d.lines[sz] = d.lines[sz] || {};
+            if (q > 0) d.lines[sz][c.s] = q; else delete d.lines[sz][c.s];
+          } })
+        ]);
+      }))
+    ]);
+  });
+  return el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Store' }), el('h2', { text: 'Wire in from delivery' }),
+      el('p', { class: 'hint', text: 'Enter the rolls received for each colour and size. You will see a preview before anything is saved.' })])]),
+    el('div', { class: 'form-grid' }, [field('Date', dateIn), field('Delivery note', refIn), field('Remarks', remIn)]),
+    el('div', { class: 'sec' }, sizeRows),
+    el('div', { style: 'margin-top:12px;text-align:right' }, [el('button', { class: 'btn primary', text: 'Preview delivery', onclick: function () {
+      var lines = {}, any = false;
+      SIZES.forEach(function (sz) {
+        CORE_COLORS.forEach(function (c) {
+          var q = d.lines[sz] && d.lines[sz][c.s] ? d.lines[sz][c.s] : 0;
+          if (q > 0) { lines[sz] = lines[sz] || {}; lines[sz][c.s] = q; any = true; }
+        });
+      });
+      if (!any) { toast('Enter at least one quantity', true); return; }
+      if (!d.date) { toast('Enter the date', true); return; }
+      pendingIn = { date: d.date, ref: d.ref.trim(), remarks: d.remarks.trim(), lines: lines };
+      render();
+      window.scrollTo(0, 0);
+    } })])
+  ]);
+}
+
+
+/* Wire in log: one card per delivery, grouped by day */
+/* Wire in log: one card per delivery, grouped by day; storekeeper's delete becomes a change request */
+function wiLog() {
+  var list = (S.receipts || []).slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id; });
+  if (!list.length) return el('div', { class: 'empty', text: 'No wire received yet.' });
+  var out = [], lastDay = null;
+  list.forEach(function (r) {
+    if (r.date !== lastDay) { out.push(el('div', { class: 'wdate', text: fdate(r.date) })); lastDay = r.date; }
+    var lb = linesBlock(r.lines || {});
+    out.push(el('div', { class: 'wg' }, [
+      el('div', { class: 'wg-h' }, [
+        el('b', { class: 'wv', text: r.ref || 'Delivery' }),
+        r.remarks ? el('span', { class: 'note', text: r.remarks }) : null,
+        el('span', { class: 'wq', text: fmt(round2(lb.total)) + ' rolls' }),
+        canWriteStore() ? armBtn('×', function () { changeEntry(r.id, 'delete', null); }) : null
+      ]),
+      lb.node
+    ]));
+  });
+  return el('div', { class: 'wlog' }, out);
+}
+
+
+/* Overview buttons: total, completed and ongoing villas in one line; tap one to list its villas */
+var ovV = null;
+var editDay = null;
+function ovVillaButtons() {
+  var all = [];
+  thList().forEach(function (t) { thVillas(t).forEach(function (x) { all.push({ th: t, b: x.b, v: x.v, st: x.st }); }); });
+  var done = all.filter(function (x) { return x.st === 'Complete'; });
+  var going = all.filter(function (x) { return x.st === 'Ongoing'; });
+  var sets = { total: all, done: done, going: going };
+  var defs = [['total', 'Total villas', '#0d9488'], ['done', 'Villas completed', '#16a34a'], ['going', 'Villas ongoing', '#ea580c']];
+  var btns = el('div', { class: 'vbtns', 'data-open': '1' }, defs.map(function (d) {
+    return el('button', { class: 'vbtn' + (ovV === d[0] ? ' on' : ''), style: '--vc:' + d[2], onclick: function () { ovV = ovV === d[0] ? null : d[0]; render(); } }, [
+      el('b', { text: String(sets[d[0]].length) }),
+      el('span', { text: d[1] })
+    ]);
+  }));
+  var kids = [btns];
+  if (ovV) {
+    var list = sets[ovV], byTh = {}, order = [];
+    list.forEach(function (x) { if (!byTh[x.th]) { byTh[x.th] = []; order.push(x.th); } byTh[x.th].push(x); });
+    kids.push(el('div', { class: 'card', 'data-open': '1', style: 'margin-top:10px;padding:12px' }, [
+      el('div', { class: 'wlog' }, order.length ? order.map(function (t) {
+        return el('div', { class: 'wg' }, [
+          el('div', { class: 'wg-h' }, [el('span', { class: 'pill ' + thPillClass(t), text: t }), el('span', { class: 'note', text: byTh[t].length + ' villas' })]),
+          el('div', { class: 'wg-e', style: 'flex-wrap:wrap;justify-content:flex-start' }, byTh[t].map(function (x) {
+            return el('span', { class: 'pill p-teal', text: 'V' + pad(thVillaNo(x.b.block, x.v)) + ' · ' + typeAt(x.b, x.v) });
+          }))
+        ]);
+      }) : [el('div', { class: 'empty', text: 'None yet.' })])
+    ]));
+  }
+  return el('div', {}, kids);
+}
+
+function viewReport() {
+  var box = el('div');
+  var villas = 0, req = 0, iss = 0;
+  S.blocks.forEach(function (b) { villas += villasIn(b); SIZES.forEach(function (sz) { req += blockReq(b, sz); }); });
+  SIZES.forEach(function (sz) { iss += issuedAll(sz); });
+  var pct = req > 0 ? Math.min(100, iss / req * 100) : 0;
+
+  box.appendChild(ovVillaButtons());
+
+  box.appendChild(ovSection());
+
+  var issuedTHs = thList().filter(function (t) {
+    return S.issues.some(function (i) { return thOf(i.block) === t; });
+  });
+  var PILL = { 'Complete': 'p-ok', 'Ongoing': 'p-pos', 'Over-issued': 'p-over', 'Not started': 'p-neutral' };
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [
+      el('div', {}, [el('span', { class: 'eyebrow', text: 'TH status' }),
+        el('h2', { text: 'Issued THs' })]),
+      el('p', { class: 'hint', text: 'Green = complete · Orange = ongoing · Red = over-issued · Tap a TH to see its villas' })
+    ]),
+    issuedTHs.length
+      ? el('div', { class: 'th-grid' }, issuedTHs.map(thCard))
+      : el('div', { class: 'empty', text: 'No wire issued yet.' })
+  ]));
+  return box;
+}
+
+/* villa status across all sizes: Over-issued > Complete > Ongoing > Not started */
+function villaStatus(b, v) {
+  var st = [], any = false;
+  SIZES.forEach(function (sz) {
+    var r = villaReq(typeAt(b, v), sz), s = issued(b.block, sz, v);
+    if (Math.abs(r) > 1e-9 || Math.abs(s) > 1e-9) any = true;
+    st.push(statusOf(r, s));
+  });
+  if (st.indexOf('Over-issued') >= 0) return 'Over-issued';
+  if (!any) return 'Not started';
+  if (st.every(function (x) { return x === 'Complete' || x === '-'; })) return 'Complete';
+  if (st.some(function (x) { return x === 'Complete' || x === 'Ongoing'; })) return 'Ongoing';
+  return 'Not started';
+}
+function thVillas(t) {
+  var out = [];
+  blocksOfTh(t).forEach(function (b) {
+    for (var v = 1; v <= villasIn(b); v++) out.push({ b: b, v: v, st: villaStatus(b, v) });
+  });
+  return out;
+}
+function thStatus(list) {
+  if (list.some(function (x) { return x.st === 'Over-issued'; })) return 'Over-issued';
+  if (list.length && list.every(function (x) { return x.st === 'Complete'; })) return 'Complete';
+  if (list.some(function (x) { return x.st === 'Complete' || x.st === 'Ongoing'; })) return 'Ongoing';
+  return 'Not started';
+}
+/* TH colour for Wire Out: green complete, orange ongoing, red over-issued */
+var TH_TONE = { 'Complete': 'tone-ok', 'Ongoing': 'tone-pos', 'Over-issued': 'tone-over' };
+var TH_PILL = { 'Complete': 'p-ok', 'Ongoing': 'p-pos', 'Over-issued': 'p-over' };
+function thTone(t) { return TH_TONE[thStatus(thVillas(t))] || ''; }
+function thPillClass(t) { return TH_PILL[thStatus(thVillas(t))] || 'p-teal'; }
+function thCard(t) {
+  var list = thVillas(t);
+  var st = thStatus(list);
+  var done = list.filter(function (x) { return x.st === 'Complete'; }).length;
+  var open = !!ui.openTh[t];
+  var PILL = { 'Complete': 'p-ok', 'Ongoing': 'p-pos', 'Over-issued': 'p-over', 'Not started': 'p-neutral' };
+  var alertNode = (me && (me.role === 'foreman' || me.role === 'chargehand') && st !== 'Complete')
+    ? el('span', { class: 'pill p-over blink', text: 'Wire pending' }) : null;
+  var kids = [el('button', { class: 'th-head', onclick: function () { ui.openTh[t] = !open; render(); } }, [
+    el('b', { text: t }),
+    el('span', { class: 'pill ' + PILL[st], text: st }),
+    alertNode,
+    el('span', { class: 'hint', text: done + ' of ' + list.length + ' villas complete' })
+  ].filter(Boolean))];
+  if (open) {
+    kids.push(el('div', { class: 'th-body' }, list.map(function (x) {
+      var sizes = SIZES.map(function (sz) {
+        return sz + ': ' + fmt(issued(x.b.block, sz, x.v)) + '/' + fmt(villaReq(typeAt(x.b, x.v), sz));
+      }).join('  ·  ');
+      return el('div', { class: 'vrow' }, [
+        el('span', { class: 'pill p-teal', text: villaLabel(x.b.block, x.v) }),
+        el('span', { class: 'vtype', text: typeAt(x.b, x.v) || '–' }),
+        el('span', { class: 'vsz', text: sizes + ' rolls' }),
+        el('span', { class: 'pill ' + PILL[x.st], text: x.st })
+      ]);
+    })));
+  }
+  return el('div', { class: 'th-card', 'data-open': '1' }, kids);
+}
+
+function kpiCard(v, label, color, pct) {
+  var kids = [el('div', { class: 'k-v', text: v }), el('div', { class: 'k-l', text: label })];
+  if (pct !== null) {
+    kids.push(el('div', { class: 'bar' }, [el('i', { style: 'width:' + pct.toFixed(1) + '%' })]));
+    kids.push(el('div', { class: 'k-l', text: pct.toFixed(0) + '% issued' }));
+  }
+  return el('div', { class: 'kpi', style: '--c:' + color }, kids);
+}
+
+function overallView() {
+  if (!S.blocks.length) return el('div', { class: 'empty', text: 'No blocks yet. Add them in Blocks & villas.' });
+  var body = S.blocks.map(function (b) {
+    var cells = [
+      el('td', {}, [el('a', { text: b.block, onclick: function () { ui.scope = b.block; render(); } })]),
+      td(el('span', { class: 'pill p-teal', text: mixText(b) || 'not set' })),
+      td(String(villasIn(b)), 'num')
+    ];
+    SIZES.forEach(function (sz) {
+      var r = blockReq(b, sz), s = issued(b.block, sz);
+      cells.push(td(fmt(r), 'num'), td(fmt(s), 'num'), balTd(r, s));
+    });
+    return el('tr', {}, cells);
+  });
+
+  var totCells = [td('Total'), td(''), td(String(S.blocks.reduce(function (s, b) { return s + villasIn(b); }, 0)), 'num')];
+  SIZES.forEach(function (sz) {
+    var r = 0; S.blocks.forEach(function (b) { r += blockReq(b, sz); });
+    var s = issuedAll(sz);
+    totCells.push(td(fmt(r), 'num'), td(fmt(s), 'num'), balTd(r, s));
+  });
+  body.push(el('tr', { class: 'total' }, totCells));
+  return el('div', { class: 'table-wrap' }, [el('table', {}, [thead(['Block', 'Villa types', 'Villas']), el('tbody', {}, body)])]);
+}
+
+function villaRow(b, v) {
+  var t = typeAt(b, v);
+  var cells = [td(el('span', { class: 'pill p-teal', text: 'V' + pad(v) })), td(t || '–')];
+  SIZES.forEach(function (sz) {
+    var r = villaReq(t, sz), s = issued(b.block, sz, v);
+    cells.push(td(fmt(r), 'num'), td(fmt(s), 'num'), balTd(r, s));
+  });
+  return el('tr', {}, cells);
+}
+
+function blockView(b) {
+  var n = villasIn(b);
+  var wrap = el('div');
+  wrap.appendChild(el('div', { class: 'grid-chips', style: 'margin-bottom:16px;align-items:center' }, [
+    el('button', { class: 'btn ghost sm', text: '← All blocks', onclick: function () { ui.scope = ''; render(); } }),
+    el('span', { class: 'pill p-teal', text: n + ' villas' }),
+    el('span', { class: 'pill p-neutral', text: mixText(b) || 'no villa types set' })
+  ]));
+
+  if (!n) {
+    wrap.appendChild(el('div', { class: 'empty', text: 'No villas in this block. Set the villa types in Blocks & villas.' }));
+    return wrap;
+  }
+
+  var body = [];
+  for (var v = 1; v <= n; v++) body.push(villaRow(b, v));
+
+  var inVillas = {}, unmatched = false;
+  SIZES.forEach(function (sz) {
+    var tot = issued(b.block, sz), inV = 0;
+    for (var v2 = 1; v2 <= n; v2++) inV += issued(b.block, sz, v2);
+    inVillas[sz] = tot - inV;
+    if (Math.abs(tot - inV) > 1e-9) unmatched = true;
+  });
+  if (unmatched) {
+    var um = [td('Not tied to a villa'), td('–')];
+    SIZES.forEach(function (sz) { um.push(td('–', 'num'), td(fmt(inVillas[sz]), 'num'), td('–', 'num')); });
+    body.push(el('tr', {}, um));
+  }
+
+  var tr = [td('Block total'), td(mixText(b))];
+  SIZES.forEach(function (sz) {
+    var r = blockReq(b, sz), s = issued(b.block, sz);
+    tr.push(td(fmt(r), 'num'), td(fmt(s), 'num'), balTd(r, s));
+  });
+  body.push(el('tr', { class: 'total' }, tr));
+
+  wrap.appendChild(el('div', { class: 'table-wrap' }, [el('table', {}, [thead(['Villa', 'Type']), el('tbody', {}, body)])]));
+  return wrap;
+}
+
+/* ---------- WIRE OUT (by TH, multi-villa, several sizes, per colour) ---------- */
+function thOf(b) { return String(b).replace(/\s+B\d+$/, ''); }
+function subOf(b) { var m = String(b).match(/\s+(B\d+)$/); return m ? m[1] : ''; }
+function thList() { var out = []; S.blocks.forEach(function (b) { var t = thOf(b.block); if (out.indexOf(t) < 0) out.push(t); }); return out; }
+function blocksOfTh(t) { return S.blocks.filter(function (b) { return thOf(b.block) === t; }); }
+function villaLabel(block, v) { var s = subOf(block); return (s ? s + ' ' : '') + 'V' + pad(v); }
+function isPicked(block, v) { return draft.picks.some(function (p) { return p.block === block && p.villa === v; }); }
+function togglePick(block, v) {
+  if (isPicked(block, v)) draft.picks = draft.picks.filter(function (p) { return !(p.block === block && p.villa === v); });
+  else draft.picks.push({ block: block, villa: v });
+}
+function villaState(block, v, sz) {
+  var req = villaReq(typeAt(blockOf(block), v), sz), iss = issued(block, sz, v);
+  if (!(req > 0)) return 'none';
+  if (iss > req + 1e-9) return 'over';
+  if (iss >= req - 1e-9) return 'done';
+  return iss > 0 ? 'part' : 'none';
+}
+/* villa tile in Wire Out: solid green complete, orange ongoing, red over-issued */
+var VT_TONE = { 'Complete': 'vt-ok', 'Ongoing': 'vt-pos', 'Over-issued': 'vt-over' };
+var STATE_COLOR = { done: '#16a34a', part: '#f97316', over: '#dc2626', none: '#94a3b8' };
+function zeroSizeCr() { var o = {}; SIZES.forEach(function (sz) { o[sz] = zeroCr(); }); return o; }
+function selSizes() { return SIZES.filter(function (sz) { return draft.sizes.indexOf(sz) >= 0; }); }
+function pickReqC(p, sz, c) { return villaReqC(typeAt(blockOf(p.block), p.villa), sz, c); }
+function pickIssC(p, sz, c) { return issued(p.block, sz, p.villa, undefined, c); }
+function pickQtyC(p, sz, c) {
+  if (draft.mode === 'custom') return num(draft.cr[sz][c]);
+  return Math.max(0, Math.round((pickReqC(p, sz, c) - pickIssC(p, sz, c)) * 100) / 100);
+}
+function coreByCode(c) { for (var i = 0; i < CORE_COLORS.length; i++) if (CORE_COLORS[i].s === c) return CORE_COLORS[i]; return null; }
+function coreChip(c) { return el('span', { class: 'core', title: c.n, style: 'background:' + c.bg + ';color:' + c.fg, text: c.s }); }
+
+/* TH filter for the wire out log (opened from the dropdown button) */
+function logThChips() {
+  return [chip('All', !ui.fTH, function () { ui.fTH = ''; ui.logOpen = false; render(); }, true)]
+    .concat(thList().map(function (t) { return chip(t, ui.fTH === t, function () { ui.fTH = t; ui.logOpen = false; render(); }, true); }));
+}
+/* wire colour order in the log: R, Y, B, BK, YG */
+function colourRank(i) { var c = coreByCode(i.colour); return c ? CORE_COLORS.indexOf(c) : 99; }
+
+function viewIssues() {
+  var box = el('div');
+  if (pendingOut) box.appendChild(outPreview());
+  var d = draft;
+  var ths = thList();
+  if (d.th && ths.indexOf(d.th) < 0) { d.th = ''; d.picks = []; }
+  var sizes = selSizes();
+
+  var thChips = el('div', { class: 'grid-chips' }, ths.map(function (t) {
+    var c = chip(t, d.th === t, function () { draft.th = t; draft.picks = []; render(); }, true);
+    c.className += ' ' + thTone(t);
+    return c;
+  }));
+
+  var villaPart = el('p', { class: 'hint', text: 'Choose a TH first.' });
+  if (d.th) {
+    var groups = blocksOfTh(d.th).map(function (b) {
+      var tiles = [];
+      var n = villasIn(b);
+      var lbl = subOf(b.block) || d.th;
+      for (var v = 1; v <= n; v++) {
+        (function (vv, bb) {
+          var on = isPicked(bb.block, vv);
+          var vt = VT_TONE[villaStatus(bb, vv)] || '';
+          tiles.push(el('button', { class: 'chip sm' + (on ? ' on' : '') + (vt ? ' ' + vt : ''), onclick: function () { togglePick(bb.block, vv); render(); } }, [
+            el('span', { class: 'dot', style: 'background:' + (vt || on ? '#fff' : STATE_COLOR[villaState(bb.block, vv, sizes[0] || '2.5')]) }),
+            el('span', { text: 'V' + pad(vv) + ' · ' + typeAt(bb, vv) })
+          ]));
+        })(v, b);
+      }
+      return el('div', { style: 'margin-top:12px' }, [
+        el('small', { style: 'font-weight:700;color:var(--muted);letter-spacing:.3px', text: lbl + ' · ' + n + ' villas' }),
+        el('div', { class: 'grid-chips', style: 'margin-top:6px' }, tiles)
+      ]);
+    });
+    villaPart = el('div', {}, [
+      el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' }, [
+        el('button', { class: 'btn ghost sm', text: 'Select all', onclick: function () {
+          draft.picks = [];
+          blocksOfTh(d.th).forEach(function (b) { for (var v = 1; v <= villasIn(b); v++) draft.picks.push({ block: b.block, villa: v }); });
+          render();
+        } }),
+        el('button', { class: 'btn ghost sm', text: 'Clear', onclick: function () { draft.picks = []; render(); } }),
+        el('span', { class: 'hint', text: d.picks.length + ' selected' })
+      ]),
+      el('div', {}, groups)
+    ]);
+  }
+
+  /* several wire sizes can be picked together: tap to add or remove */
+  var sizeSeg = el('div', { class: 'seg' }, SIZES.map(function (sz) {
+    var on = d.sizes.indexOf(sz) >= 0;
+    return el('button', { class: on ? 'on' : null, onclick: function () {
+      if (on) draft.sizes = d.sizes.filter(function (x) { return x !== sz; });
+      else draft.sizes = d.sizes.concat([sz]);
+      render();
+    } }, [sizeDot(sz), sz + ' sqmm', coreStrip()]);
+  }));
+
+  var modeSeg = el('div', { class: 'seg' }, [
+    el('button', { class: d.mode === 'req' ? 'on' : null, onclick: function () { draft.mode = 'req'; render(); } }, ['Issue required']),
+    el('button', { class: d.mode === 'custom' ? 'on' : null, onclick: function () { draft.mode = 'custom'; render(); } }, ['Custom rolls'])
+  ]);
+
+  /* for each selected size, one row per core colour, summed over the selected villas */
+  var colourPart = el('p', { class: 'hint', text: 'Select a wire size.' });
+  if (sizes.length && d.picks.length) {
+    colourPart = el('div', { style: 'display:grid;gap:12px' }, sizes.map(function (sz) {
+      var rows = CORE_COLORS.map(function (c) {
+        var req = 0, iss = 0, qty = 0;
+        d.picks.forEach(function (p) { req += pickReqC(p, sz, c.s); iss += pickIssC(p, sz, c.s); qty += pickQtyC(p, sz, c.s); });
+        var right = d.mode === 'custom'
+          ? stepper(num(d.cr[sz][c.s]), 1, 0, null, function (v) { draft.cr[sz][c.s] = v; render(); }, 'rolls', true)
+          : el('span', { class: 'cval', text: 'To issue ' + fmt(round2(qty)) + ' rolls' });
+        return el('div', { class: 'crow' }, [
+          el('span', { class: 'cname' }, [coreChip(c), el('span', { text: c.n })]),
+          el('span', { class: 'cval', text: 'Req ' + fmt(round2(req)) }),
+          el('span', { class: 'cval', text: 'Issued ' + fmt(round2(iss)) }),
+          el('span', { class: 'cbal' }, [balPill(req, iss)]),
+          right
+        ]);
+      });
+      return el('div', { style: 'display:grid;gap:8px' }, [
+        el('span', { class: 'pill', style: 'justify-self:start;background:' + SIZE_COLOR[sz] + '22;color:' + SIZE_COLOR[sz], text: sz + ' sqmm' })
+      ].concat(rows));
+    }));
+  } else if (sizes.length) {
+    colourPart = el('p', { class: 'hint', text: 'Select villas to see each colour.' });
+  }
+
+  var modeHint = d.mode === 'req'
+    ? el('p', { class: 'hint', text: 'Each selected villa gets each colour\'s required rolls, minus what is already issued.' })
+    : el('p', { class: 'hint', text: 'Enter rolls per colour and size. The same rolls go to every selected villa.' });
+
+  var dateIn = el('input', { type: 'date', class: 'txt', value: d.date, onchange: function () { draft.date = this.value; } });
+  var toIn = el('input', { type: 'text', class: 'txt', placeholder: 'Foreman / team', value: d.to, onchange: function () { draft.to = this.value; } });
+  var remIn = el('input', { type: 'text', class: 'txt', placeholder: 'Optional', value: d.remarks, onchange: function () { draft.remarks = this.value; } });
+
+  var previewNode = el('p', { class: 'hint', text: 'Select villas and wire sizes to see the balance.' });
+  var nLines = 0, totQty = 0;
+  if (d.picks.length && sizes.length) {
+    var req = 0, iss = 0;
+    d.picks.forEach(function (p) {
+      sizes.forEach(function (sz) {
+        CORE_COLORS.forEach(function (c) {
+          req += pickReqC(p, sz, c.s); iss += pickIssC(p, sz, c.s);
+          var q = pickQtyC(p, sz, c.s); if (q > 0) { nLines++; totQty += q; }
+        });
+      });
+    });
+    previewNode = el('div', {}, [
+      el('div', { class: 'mini' }, [
+        el('div', {}, [el('small', { text: 'VILLAS' }), el('b', { text: String(d.picks.length) })]),
+        el('div', {}, [el('small', { text: 'REQUIRED' }), el('b', { text: fmt(round2(req)) + ' rolls' })]),
+        el('div', {}, [el('small', { text: 'ISSUED SO FAR' }), el('b', { text: fmt(round2(iss)) + ' rolls' })])
+      ]),
+      el('p', { class: 'hint', style: 'margin-top:10px;text-align:center', text: 'Will record ' + nLines + ' issue' + (nLines === 1 ? '' : 's') + ' · ' + fmt(round2(totQty)) + ' rolls' }),
+      el('div', { style: 'text-align:center;margin-top:6px' }, [balPill(req, iss)])
+    ]);
+  }
+
+  var addBtn = el('button', { class: 'btn primary', text: canRequestOut() ? 'Preview stock-out request' : 'Preview wire out', onclick: function () {
+    if (!d.th) { toast('Choose a TH', true); return; }
+    if (!d.picks.length) { toast('Select at least one villa', true); return; }
+    if (!sizes.length) { toast('Select at least one wire size', true); return; }
+    if (d.mode === 'custom' && !sizes.some(function (sz) { return CORE_COLORS.some(function (c) { return num(d.cr[sz][c.s]) > 0; }); })) { toast('Enter rolls for at least one colour', true); return; }
+    if (canRequestOut() && !(d.to || '').trim()) { toast('Enter the name the wire is for', true); return; }
+    var rows = [];
+    d.picks.forEach(function (p) {
+      sizes.forEach(function (sz) {
+        CORE_COLORS.forEach(function (c) {
+          var q = pickQtyC(p, sz, c.s);
+          if (q > 0) rows.push({ block: p.block, villa: p.villa, size: sz, colour: c.s, rolls: round2(q) });
+        });
+      });
+    });
+    if (!rows.length) { toast('Nothing due: selected villas already have their required wire', true); return; }
+    pendingOut = { mode: canRequestOut() ? 'req' : 'issue', date: d.date || localDate(), to: (d.to || '').trim(), remarks: (d.remarks || '').trim(), rows: rows };
+    render();
+    window.scrollTo(0, 0);
+  } });
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [
+      el('div', {}, [el('span', { class: 'eyebrow', text: 'New entry' }), el('h2', { text: canRequestOut() ? 'Request stock out' : 'Record wire out' })])
+    ]),
+    el('div', { class: 'sec' }, [step(1, 'TH number'), thChips]),
+    el('div', { class: 'sec' }, [step(2, d.th ? 'Villas in ' + d.th + ' (tap to select)' : 'Villas'), villaPart]),
+    el('div', { class: 'form-grid sec' }, [
+      el('div', {}, [step(3, 'Wire sizes (tap one or more)'), sizeSeg]),
+      el('div', {}, [step(4, 'Quantity'), modeSeg, el('div', { style: 'margin-top:8px' }, [modeHint])])
+    ]),
+    el('div', { class: 'sec' }, [step(5, sizes.length ? 'Colours in ' + sizes.join(', ') + ' sqmm' : 'Colours'), colourPart]),
+    el('div', { class: 'form-grid sec' }, [field('Date', dateIn), field(canRequestOut() ? 'For (name the wire is for) *' : 'Issued to', toIn), field('Remarks', remIn)]),
+    el('div', { class: 'preview' }, [el('span', { class: 'eyebrow', text: 'Balance preview' }), el('div', { style: 'margin-top:10px' }, [previewNode])]),
+    el('div', { style: 'margin-top:16px;text-align:right' }, [addBtn])
+  ]));
+
+  var list = S.issues.filter(function (i) { return !ui.fTH || thOf(i.block) === ui.fTH; }).slice().reverse();
+  var total = 0;
+  /* grouped by day (date shown once), then by TH + villa + wire size; each colour is one icon */
+  var total = 0, dayMap = {}, dayOrder = [];
+  list.forEach(function (i) {
+    total += iR(i);
+    if (!dayMap[i.date]) { dayMap[i.date] = { groups: {}, order: [] }; dayOrder.push(i.date); }
+    var dm = dayMap[i.date];
+    var noVilla = i.villa === '' || i.villa === null || i.villa === undefined;
+    var key = i.block + '|' + (noVilla ? '' : String(i.villa)) + '|' + String(i.size);
+    if (!dm.groups[key]) {
+      dm.groups[key] = { th: thOf(i.block), villa: noVilla ? 'Whole TH' : 'V' + pad(thVillaNo(i.block, Number(i.villa))), size: String(i.size), items: [], sum: 0 };
+      dm.order.push(key);
+    }
+    var g = dm.groups[key];
+    g.items.push(i); g.sum += iR(i);
+  });
+  var rows = [];
+  dayOrder.forEach(function (day) {
+    var dm = dayMap[day];
+    var editing = editDay === day;
+    rows.push(el('div', { class: 'wdate wdate-row' }, [
+      el('span', { text: fdate(day) }),
+      canWriteStore() ? el('button', { class: 'btn ghost sm', text: editing ? 'Done' : 'Edit', onclick: function () { editDay = editing ? null : day; render(); } }) : null
+    ]));
+    dm.order.forEach(function (key) {
+      var g = dm.groups[key];
+      var sc = SIZE_COLOR[g.size] || '#64748b';
+      rows.push(el('div', { class: 'wg' }, [
+        el('div', { class: 'wg-h' }, [
+          el('span', { class: 'pill ' + thPillClass(g.th), text: g.th }),
+          el('b', { class: 'wv', text: g.villa }),
+          el('span', { class: 'pill', style: 'background:' + sc + '22;color:' + sc, text: g.size + ' sqmm' }),
+          el('b', { class: 'wq', text: fmt(round2(g.sum)) + ' rolls' })
+        ]),
+        el('div', { class: 'wg-e' }, g.items.slice().sort(function (a, b) { return colourRank(a) - colourRank(b) || a.id - b.id; }).map(function (i) {
+          var cc = coreByCode(i.colour);
+          var info = '#' + i.id + ' · ' + i.date + (i.to ? ' · ' + i.to : '') + (i.remarks ? ' · ' + i.remarks : '');
+          return el('span', { class: 'went', title: info }, [
+            cc ? coreChip(cc) : el('span', { class: 'hint', text: '–' }),
+            editing
+              ? el('input', { type: 'number', class: 'txt wi-in wo-edit', min: '0', step: '0.5', value: String(iR(i)), onchange: function () {
+                  var q = Math.max(0, Math.round((Number(this.value) || 0) * 2) / 2);
+                  if (q <= 0) { toast('Use × to remove an entry', true); render(); return; }
+                  changeEntry(i.id, 'edit', q);
+                } })
+              : el('b', { text: fmt(iR(i)) }),
+            canWriteStore() ? armBtn('×', function () { changeEntry(i.id, 'delete', null); }) : null
+          ]);
+        }))
+      ]));
+    });
+  });
+  if (rows.length) rows.push(el('div', { class: 'wtotal' }, [el('span', { text: 'Total' }), el('b', { text: fmt(total) + ' rolls' })]));
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [
+      el('div', {}, [el('span', { class: 'eyebrow', text: 'History' }), el('h2', { text: 'Wire out log' })]),
+      el('button', { class: 'btn ghost sm', text: (ui.fTH || 'All TH') + '  ' + (ui.logOpen ? '▴' : '▾'), onclick: function () { ui.logOpen = !ui.logOpen; render(); } })
+    ]),
+    ui.logOpen ? el('div', { class: 'grid-chips', style: 'margin-bottom:12px' }, logThChips()) : null,
+    list.length ? el('div', { class: 'wlog' }, rows) : el('div', { class: 'empty', text: 'No wire out recorded yet.' })
+  ]));
+  return box;
+}
+
+/* ---------- BLOCKS & VILLAS ---------- */
+function setMix(mix, t, n) {
+  if (n > 0) mix[t] = n; else delete mix[t];
+  return mix;
+}
+/* One row per villa type: name pill + stepper. onChange(type, n) */
+function typeSteppers(mix, onChange, small) {
+  return el('div', { style: 'display:flex;flex-direction:column;gap:8px' }, S.types.map(function (t) {
+    return el('div', { class: 'trow' }, [
+      el('span', { class: 'pill p-teal', text: t.name }),
+      stepper(Math.max(0, Math.floor(num(mix[t.name]))), 1, 0, null, function (v) { onChange(t.name, v); }, '', small)
+    ]);
+  }));
+}
+
+function importCsv(text) {
+  var lines = text.split(/\r?\n/), ok = 0, errs = [];
+  lines.forEach(function (line, idx) {
+    line = line.trim();
+    if (!line) return;
+    var p = line.split(',').map(function (x) { return x.trim(); });
+    if (p[0].toLowerCase() === 'block') return;
+    var name = p[0];
+    if (!name) { errs.push('line ' + (idx + 1) + ': no block'); return; }
+    var mix = {}, bad = '';
+    if (p.length >= 3 && p[1] && p[1].indexOf('=') < 0) {
+      if (!typeOf(p[1])) bad = 'unknown type "' + p[1] + '"';
+      else mix[p[1]] = Math.max(0, Math.floor(num(p[2])));
+    } else if (p[1]) {
+      p[1].split(';').forEach(function (pair) {
+        var kv = pair.split('=');
+        var t = (kv[0] || '').trim();
+        if (!typeOf(t)) bad = 'unknown type "' + t + '"';
+        else mix[t] = Math.max(0, Math.floor(num(kv[1])));
+      });
+    }
+    if (bad) { errs.push('line ' + (idx + 1) + ': ' + bad); return; }
+    var b = blockOf(name);
+    if (b) b.mix = mix;
+    else S.blocks.push({ block: name, mix: mix });
+    ok++;
+  });
+  save();
+  return { ok: ok, errs: errs };
+}
+
+function viewBlocks() {
+  var box = el('div');
+
+  var list = thList();
+  if (!list.length) box.appendChild(el('div', { class: 'empty', text: 'No blocks yet.' }));
+  else box.appendChild(el('div', { class: 'blocks-grid compact' }, list.map(function (t) {
+    var bl = blocksOfTh(t);
+    var n = bl.reduce(function (s, b) { return s + villasIn(b); }, 0);
+    var used = S.issues.some(function (i) { return thOf(i.block) === t; });
+    return el('div', { class: 'bcard compact' }, [
+      el('div', { class: 'bcard-h' }, [
+        el('span', { class: 'th-name', text: t }),
+        el('span', { class: 'pill p-teal', text: n + ' villas' })
+      ]),
+      el('div', { class: 'bmix', text: thMixText(t) || 'No villa types' }),
+      el('div', { class: 'bsz' }, SIZES.map(function (sz) {
+        var req = bl.reduce(function (s, b) { return s + blockReq(b, sz); }, 0);
+        return el('span', {}, [sz + ': ', el('b', { text: fmt(round2(req)) })]);
+      }).concat([el('span', { class: 'hint', text: 'rolls' })])),
+      el('div', { class: 'cfoot' }, [
+        el('span', { class: 'note', text: used ? 'Has issues' : 'No issues' })
+      ])
+    ]);
+  })));
+
+  return box;
+}
+
+/* ---------- VILLA TYPES ---------- */
+function viewTypes() {
+  var box = el('div');
+
+  if (!S.types.length) box.appendChild(el('div', { class: 'empty', text: 'No villa types yet.' }));
+  else box.appendChild(el('div', { class: 'blocks-grid' }, S.types.map(function (t) {
+    var villas = 0, blocksUsing = 0;
+    S.blocks.forEach(function (b) { var c = Math.max(0, Math.floor(num(mixOf(b)[t.name]))); if (c > 0) { villas += c; blocksUsing++; } });
+    return el('div', { class: 'bcard' }, [
+      el('div', { class: 'bcard-h' }, [
+        el('input', { type: 'text', class: 'th-name', value: t.name, onchange: function () {
+          var nv = this.value.trim();
+          if (!nv || (nv !== t.name && typeOf(nv))) { toast('Name empty or already used', true); render(); return; }
+          S.blocks.forEach(function (b) {
+            if (mixOf(b)[t.name] !== undefined) { b.mix[nv] = b.mix[t.name]; delete b.mix[t.name]; }
+          });
+          t.name = nv; save(); render();
+        } }),
+        el('span', { class: 'pill p-teal', text: blocksUsing + ' blocks · ' + villas + ' villas' })
+      ]),
+      el('div', { class: 'tgrid-wrap' }, [el('div', { class: 'tgrid' }, flat([
+        [el('span', { class: 'hint', text: 'Colour' })],
+        SIZES.map(function (sz) {
+          return el('span', { class: 'pill', style: 'background:' + SIZE_COLOR[sz] + '22;color:' + SIZE_COLOR[sz], text: sz + ' sqmm' });
+        }),
+        flat(CORE_COLORS.map(function (c) {
+          return [el('span', { class: 'cname' }, [coreChip(c), el('span', { text: c.n })])].concat(SIZES.map(function (sz) {
+            return stepper(num(t.w[sz][c.s]), 1, 0, null, function (v) { t.w[sz][c.s] = v; save(); render(); }, 'rolls', true);
+          }));
+        })),
+        [el('span', { class: 'hint', text: 'Total per villa' })].concat(SIZES.map(function (sz) {
+          return el('b', { class: 'tot', text: fmt(round2(villaReq(t.name, sz))) + ' rolls' });
+        }))
+      ]))]),
+      el('div', { class: 'cfoot' }, [
+        el('span', { class: 'note', text: blocksUsing ? 'In use by blocks' : 'Not used yet' }),
+        blocksUsing ? el('span', { class: 'pill p-neutral', text: 'Locked' }) : armBtn('Remove', function () {
+          S.types = S.types.filter(function (x) { return x !== t; });
+          save(); render();
+        })
+      ])
+    ]);
+  })));
+  return box;
+}
+
+/* ---------- BACKUP & LOG ---------- */
+function reportCsv() {
+  var head = ['Block', 'Villa types', 'Villas'];
+  SIZES.forEach(function (sz) { head.push(sz + ' sqmm required (rolls)', sz + ' sqmm issued (rolls)', sz + ' sqmm balance (rolls)'); });
+  var lines = [head.join(',')];
+  S.blocks.forEach(function (b) {
+    var r = [b.block, mixEntries(b).map(function (e) { return e.type + '=' + e.n; }).join(';'), villasIn(b)];
+    SIZES.forEach(function (sz) { var q = blockReq(b, sz), s = issued(b.block, sz); r.push(csvNum(q), csvNum(s), csvNum(q - s)); });
+    lines.push(r.join(','));
+  });
+  return lines.join('\n');
+}
+
+function backupText() {
+  return JSON.stringify({
+    app: 'Taormina Wire Tracker', version: APP_VERSION, exported_at: new Date().toISOString(),
+    types: S.types, blocks: S.blocks, entries: SRV.entries, change_requests: SRV.changes, stock_requests: SRV.stock
+  }, null, 2);
+}
+
+/* one-time: move the records this browser kept under the old version into the shared store */
+function importOld(o) {
+  var rows = [];
+  (o.issues || []).forEach(function (i) {
+    rows.push({ kind: 'out', entry_date: i.date, block: i.block, villa: i.villa === '' || i.villa === null || i.villa === undefined ? null : Number(i.villa),
+      size: String(i.size), colour: i.colour, rolls: num(i.rolls), to_name: i.to || '', remarks: i.remarks || '' });
+  });
+  (o.receipts || []).forEach(function (r) {
+    rows.push({ kind: 'in', entry_date: r.date, ref: r.ref || '', remarks: r.remarks || '', lines: r.lines || {} });
+  });
+  if (!rows.length) return Promise.resolve(0);
+  return rpc('wt_add_entries', { p_token: SRV.token, p_rows: rows }).then(function (n) {
+    try { localStorage.setItem(IMPORT_KEY, '1'); } catch (e) {}
+    return n;
+  });
+}
+
+function viewData() {
+  var box = el('div');
+  var resetIn = el('input', { type: 'text', class: 'txt', placeholder: 'Type RESET', style: 'max-width:200px' });
+  var old = me.role === 'admin' ? localOld() : null;
+  var canImport = !!old && !localStorage.getItem(IMPORT_KEY) && (old.issues.length || (old.receipts || []).length);
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Backup' }), el('h2', { text: 'Export' }),
+      el('p', { class: 'hint', text: 'The shared store is the record. Export a JSON copy any time. Restoring an old file is switched off, so the shared record cannot be overwritten by mistake.' })])]),
+    el('div', { class: 'grid-chips', style: 'margin-bottom:6px' }, [
+      el('button', { class: 'btn primary', text: 'Export JSON backup', onclick: function () {
+        download('Taormina Wire Tracker Backup V' + APP_VERSION + '.json', backupText(), 'application/json');
+      } }),
+      el('button', { class: 'btn ghost', text: 'Export report (CSV)', onclick: function () {
+        download('Taormina Wire Report V' + APP_VERSION + '.csv', reportCsv(), 'text/csv');
+      } })
+    ])
+  ]));
+
+  if (canImport) {
+    box.appendChild(el('div', { class: 'card' }, [
+      el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'One time' }), el('h2', { text: 'Move records kept in this browser' }),
+        el('p', { class: 'hint', text: 'The old version kept wire in and wire out in this browser only. This adds them to the shared store once. Blocks and villa types are already shared.' })])]),
+      el('button', { class: 'btn primary', text: 'Upload old records', onclick: function () {
+        act(function () { return importOld(old).then(function (n) { toast('Imported ' + n + ' records'); }); });
+      } })
+    ]));
+  }
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Danger zone' }), el('h2', { text: 'Reset issued wire to zero' }),
+      el('p', { class: 'hint', text: 'Downloads a full backup first, then clears only the issued wire quantities. Blocks, villa types and their requirements stay as they are. Type RESET to confirm.' })])]),
+    el('div', { class: 'grid-chips' }, [resetIn, el('button', { class: 'btn danger', text: 'Reset issued wire', onclick: function () {
+      if (resetIn.value.trim() !== 'RESET') { toast('Type RESET to confirm', true); return; }
+      download('Taormina Wire Backup before reset V' + APP_VERSION + '.json', backupText(), 'application/json');
+      act(function () {
+        return rpc('wt_reset_issues', { p_token: SRV.token }).then(function (n) { resetIn.value = ''; toast('Backup downloaded · ' + n + ' issued lines cleared'); });
+      });
+    } })])
+  ]));
+
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Release notes' }), el('h2', { text: 'Change log · current v' + APP_VERSION })])]),
+    el('div', { class: 'note' }, CHANGELOG.map(function (c) {
+      return el('p', { style: 'margin:0 0 12px' }, [el('b', { style: 'color:var(--navy)', text: 'v' + c.v + ' · ' + c.d + '  ' }), c.t]);
+    }))
+  ]));
+  return box;
+}
+
+/* ---------- REPORTS: daily and until-now, PDF and Excel ---------- */
+function round2(n) { return Math.round(n * 100) / 100; }
+function fdate(s) {
+  if (!s) return '';
+  var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var p = s.split('-');
+  return pad(+p[2]) + ' ' + m[+p[1] - 1] + ' ' + p[0];
+}
+function statusOf(req, iss) {
+  var b = req - iss;
+  if (Math.abs(req) < 1e-9 && Math.abs(iss) < 1e-9) return '-';
+  if (b < -1e-9) return 'Over-issued';
+  if (Math.abs(b) <= 1e-9) return 'Complete';
+  if (iss <= 1e-9) return 'Not started';
+  return 'Ongoing';
+}
+function mixTextA(b) { return mixEntries(b).map(function (e) { return e.type + ' x ' + e.n; }).join(', '); }
+function villaTxt(v) { return (v === '' || v === null || v === undefined) ? 'Block' : 'V' + pad(v); }
+/* ---- reports: TH level only (no sub-block labels) ---- */
+function blocksInScope(scope) { return scope ? S.blocks.filter(function (b) { return thOf(b.block) === scope; }) : S.blocks; }
+/* villa number within its TH, counted across the TH's sub-blocks in order */
+function thVillaNo(block, v) {
+  var off = 0, t = thOf(block);
+  var bs = blocksOfTh(t);
+  for (var i = 0; i < bs.length; i++) {
+    if (bs[i].block === block) return off + Number(v);
+    off += villasIn(bs[i]);
+  }
+  return Number(v);
+}
+function thMixText(t) {
+  var c = {};
+  blocksOfTh(t).forEach(function (b) { mixEntries(b).forEach(function (e) { c[e.type] = (c[e.type] || 0) + e.n; }); });
+  return Object.keys(c).map(function (k) { return k + ' x ' + c[k]; }).join(', ');
+}
+function statusSheet(scope, asOf, name, title) {
+  var headers = ['TH', 'Villa types', 'Villas'];
+  SIZES.forEach(function (sz) { headers.push('Req ' + sz, 'Issued ' + sz, 'Bal ' + sz); });
+  headers.push('Status');
+  var rows = [], total = null;
+  if (!scope) {
+    var tv = 0, tr = {}, ti = {};
+    SIZES.forEach(function (sz) { tr[sz] = 0; ti[sz] = 0; });
+    thList().forEach(function (t) {
+      var bs = blocksOfTh(t), vil = 0, R = 0, I = 0;
+      var row = [t, thMixText(t), 0];
+      SIZES.forEach(function (sz) {
+        var r = 0, s = 0;
+        bs.forEach(function (b) { r += blockReq(b, sz); s += issued(b.block, sz, undefined, asOf); });
+        row.push(round2(r), round2(s), round2(r - s));
+        R += r; I += s; tr[sz] += r; ti[sz] += s;
+      });
+      bs.forEach(function (b) { vil += villasIn(b); });
+      row[2] = vil; tv += vil;
+      row.push(statusOf(R, I));
+      rows.push(row);
+    });
+    total = ['Total', '', tv];
+    var GR = 0, GI = 0;
+    SIZES.forEach(function (sz) { total.push(round2(tr[sz]), round2(ti[sz]), round2(tr[sz] - ti[sz])); GR += tr[sz]; GI += ti[sz]; });
+    total.push(statusOf(GR, GI));
+  } else {
+    var bs2 = blocksOfTh(scope);
+    var no = 0;
+    bs2.forEach(function (bk) {
+      for (var v = 1; v <= villasIn(bk); v++) {
+        no++;
+        var t = typeAt(bk, v);
+        var row2 = ['V' + pad(no), t || '-', 1], R2 = 0, I2 = 0;
+        SIZES.forEach(function (sz) {
+          var r2 = villaReq(t, sz), s2 = issued(bk.block, sz, v, asOf);
+          row2.push(round2(r2), round2(s2), round2(r2 - s2));
+          R2 += r2; I2 += s2;
+        });
+        row2.push(statusOf(R2, I2));
+        rows.push(row2);
+      }
+    });
+    var um = ['Not tied to a villa', '-', ''], anyUm = false;
+    SIZES.forEach(function (sz) {
+      var d = 0;
+      bs2.forEach(function (bk) {
+        var inV = 0;
+        for (var v2 = 1; v2 <= villasIn(bk); v2++) inV += issued(bk.block, sz, v2, asOf);
+        d += issued(bk.block, sz, undefined, asOf) - inV;
+      });
+      d = round2(d);
+      if (Math.abs(d) > 1e-9) anyUm = true;
+      um.push('-', d, '-');
+    });
+    um.push('-');
+    if (anyUm) rows.push(um);
+    total = [scope + ' total', thMixText(scope), no];
+    var GR2 = 0, GI2 = 0;
+    SIZES.forEach(function (sz) {
+      var r3 = 0, s3 = 0;
+      bs2.forEach(function (b) { r3 += blockReq(b, sz); s3 += issued(b.block, sz, undefined, asOf); });
+      total.push(round2(r3), round2(s3), round2(r3 - s3));
+      GR2 += r3; GI2 += s3;
+    });
+    total.push(statusOf(GR2, GI2));
+  }
+  return mkSheet(name, title, headers, rows, total, 'No TH to show');
+}
+
+function issuesList(scope, pred) {
+  return S.issues.filter(function (i) { return (!scope || thOf(i.block) === scope) && pred(i); })
+    .sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+      if (thOf(a.block) !== thOf(b.block)) return thOf(a.block) < thOf(b.block) ? -1 : 1;
+      return thVillaNo(a.block, num(a.villa)) - thVillaNo(b.block, num(b.villa));
+    });
+}
+
+function issuesSheet(name, title, list) {
+  var rows = list.map(function (i) {
+    var noVilla = i.villa === '' || i.villa === null || i.villa === undefined;
+    return [i.date, thOf(i.block), noVilla ? 'Whole TH' : 'V' + pad(thVillaNo(i.block, i.villa)), num(i.size), iR(i), i.to || '', i.remarks || ''];
+  });
+  var rt = list.reduce(function (s, i) { return s + iR(i); }, 0);
+  return mkSheet(name, title, ['Date', 'TH', 'Villa', 'Size (sqmm)', 'Rolls', 'Issued to', 'Remarks'], rows,
+    ['Total', '', '', '', round2(rt), '', ''], 'No wire issued in this selection');
+}
+
+function buildReport(kind, asOf, scope) {
+  var name = scope || 'All TH';
+  if (kind === 'daily') {
+    var list = issuesList(scope, function (i) { return i.date === asOf; });
+    var rollsTotal = list.reduce(function (s, i) { return s + iR(i); }, 0);
+    var dRows = [];
+    (scope ? [scope] : thList()).forEach(function (t) {
+      var sums = { '2.5': 0, '4': 0, '6': 0 }, any = false;
+      list.forEach(function (i) {
+        if (thOf(i.block) !== t) return;
+        var k = String(i.size);
+        sums[k] = (sums[k] || 0) + iR(i);
+        any = true;
+      });
+      if (any) dRows.push([t, round2(sums['2.5']), round2(sums['4']), round2(sums['6']), round2(sums['2.5'] + sums['4'] + sums['6'])]);
+    });
+    var dT = ['Total', 0, 0, 0, 0];
+    dRows.forEach(function (r) { for (var k = 1; k < 5; k++) dT[k] += r[k]; });
+    for (var q = 1; q < 5; q++) dT[q] = round2(dT[q]);
+    return {
+      kind: kind, title: 'Daily wire issue report', subtitle: name + '  |  ' + fdate(asOf),
+      kpis: [['Date', fdate(asOf)], ['Issues', String(list.length)], ['Rolls issued', fmt(rollsTotal) + ' rolls'], ['TH issued', String(dRows.length)]],
+      sheets: [
+        issuesSheet('Issues on day', 'Wire issued on ' + fdate(asOf) + ' - ' + name, list),
+        mkSheet('Day totals', 'Rolls issued on ' + fdate(asOf) + ' by TH', ['TH', '2.5 sqmm (rolls)', '4 sqmm (rolls)', '6 sqmm (rolls)', 'Total (rolls)'], dRows, dT, 'No wire issued in this selection'),
+        statusSheet(scope, asOf, 'Status at date', 'Balance status as of ' + fdate(asOf) + ' - ' + name)
+      ]
+    };
+  }
+  var vil = 0, req = 0, iss = 0;
+  blocksInScope(scope).forEach(function (b) {
+    vil += villasIn(b);
+    SIZES.forEach(function (sz) { req += blockReq(b, sz); iss += issued(b.block, sz, undefined, asOf); });
+  });
+  var list2 = issuesList(scope, function (i) { return i.date <= asOf && SIZES.indexOf(String(i.size)) >= 0; });
+  return {
+    kind: kind, title: 'Wire status report - until now', subtitle: name + '  |  as of ' + fdate(asOf),
+    kpis: [['As of', fdate(asOf)], ['Villas', String(vil)], ['Wire required', fmt(req) + ' rolls'], ['Issued to date', fmt(iss) + ' rolls'], ['Balance', fmt(req - iss) + ' rolls']],
+    sheets: [
+      statusSheet(scope, asOf, 'Status to date', 'Status as of ' + fdate(asOf) + ' - ' + name),
+      issuesSheet('Issues to date', 'All wire issued up to ' + fdate(asOf) + ' - ' + name, list2)
+    ]
+  };
+}
+
+function mkSheet(name, title, headers, rows, total, emptyMsg) {
+  if (!rows.length) rows = [[emptyMsg].concat(headers.slice(1).map(function () { return ''; }))];
+  var all = [headers].concat(rows, total ? [total] : []);
+  var raw = headers.map(function (h, i) {
+    var m = String(h).length;
+    all.forEach(function (r) { var l = String(r[i] == null ? '' : r[i]).length; if (l > m) m = l; });
+    return Math.min(160, Math.max(36, m * 4.6 + 12));
+  });
+  var sum = raw.reduce(function (a, b) { return a + b; }, 0);
+  var widths = raw.map(function (w) { return w * 523 / sum; });
+  var aligns = headers.map(function (h, i) {
+    var isNum = rows.some(function (r) { return typeof r[i] === 'number'; }) || (total && typeof total[i] === 'number');
+    return isNum ? 'r' : 'l';
+  });
+  return { name: name, title: title, headers: headers, rows: rows, total: total || null, widths: widths, aligns: aligns };
+}
+
+/* ---- ASCII-safe text for PDF (built-in fonts) ---- */
+function asc(s) {
+  return String(s == null ? '' : s).replace(/·/g, '|').replace(/[–—]/g, '-').replace(/×/g, 'x')
+    .replace(/→/g, '->').replace(/←/g, '<-').replace(/[^\x20-\x7E]/g, '?');
+}
+function esc(s) { return s.replace(/[\\()]/g, '\\$&'); }
+
+/* ---- PDF writer (A4 portrait, Helvetica) ---- */
+function makePdf(rep) {
+  var W = 595, H = 842, M = 36, LIMIT = H - 46;
+  var NAVY = '#0f2747', TEAL = '#0d9488', TEAL_D = '#0f766e';
+  var pages = [], ops = null;
+  function col(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255].map(function (v) { return v.toFixed(3); }).join(' ');
+  }
+  function rect(x, y, w, h, hex) {
+    ops.push(col(hex) + ' rg ' + x.toFixed(2) + ' ' + (H - y - h).toFixed(2) + ' ' + w.toFixed(2) + ' ' + h.toFixed(2) + ' re f');
+  }
+  function hline(x1, x2, y, hex) {
+    ops.push(col(hex) + ' RG 0.5 w ' + x1.toFixed(2) + ' ' + (H - y).toFixed(2) + ' m ' + x2.toFixed(2) + ' ' + (H - y).toFixed(2) + ' l S');
+  }
+  function text(x, y, s, size, bold, hex, align, boxW) {
+    var t = asc(s), w = t.length * size * (bold ? 0.55 : 0.5), xx = x;
+    if (align === 'r') xx = x + boxW - w;
+    ops.push('BT /F' + (bold ? 2 : 1) + ' ' + size + ' Tf ' + col(hex) + ' rg ' + xx.toFixed(2) + ' ' + (H - y - size * 0.85).toFixed(2) + ' Td (' + esc(t) + ') Tj ET');
+  }
+  function fit(s, size, maxW) {
+    var t = asc(s), max = Math.max(1, Math.floor(maxW / (size * 0.5)));
+    return t.length > max ? t.slice(0, Math.max(1, max - 2)) + '..' : t;
+  }
+  function newPage() { ops = []; pages.push(ops); }
+  function header(first) {
+    newPage();
+    if (first) {
+      rect(0, 0, W, 84, NAVY); rect(0, 84, W, 3, TEAL);
+      text(M, 16, rep.title, 16, true, '#ffffff');
+      text(M, 44, rep.subtitle, 8.5, false, '#c7f3ee');
+      var n = rep.kpis.length, gap = 8, bw = (W - 2 * M - gap * (n - 1)) / n;
+      rep.kpis.forEach(function (k, i) {
+        var x = M + i * (bw + gap);
+        rect(x, 100, bw, 46, '#f1f8f7'); rect(x, 100, 3, 46, TEAL);
+        text(x + 10, 107, k[0], 7, false, '#64748b');
+        text(x + 10, 120, k[1], 11, true, NAVY);
+      });
+      return 162;
+    }
+    text(M, 18, rep.title + '  |  ' + rep.subtitle, 7.5, false, '#64748b');
+    hline(M, W - M, 30, '#cbd5e1');
+    return 42;
+  }
+  function table(sh, y) {
+    var CW = W - 2 * M, widths = sh.widths, aligns = sh.aligns;
+    function drawHead(yy) {
+      rect(M, yy, CW, 16, NAVY);
+      var x = M;
+      sh.headers.forEach(function (h, i) {
+        text(x + 3, yy + 4.5, fit(h, 6.5, widths[i] - 6), 6.5, true, '#ffffff', aligns[i], widths[i] - 6);
+        x += widths[i];
+      });
+    }
+    if (y + 70 > LIMIT) y = header(false);
+    text(M, y, sh.title, 10, true, NAVY);
+    y += 17;
+    drawHead(y); y += 16;
+    var rows = sh.rows.map(function (r) { return { cells: r, tot: false }; });
+    if (sh.total) rows.push({ cells: sh.total, tot: true });
+    rows.forEach(function (row, ri) {
+      if (y + 13 > LIMIT) { y = header(false); drawHead(y); y += 16; }
+      if (row.tot) rect(M, y, CW, 13, '#e6f7f5');
+      else if (ri % 2 === 1) rect(M, y, CW, 13, '#f7fbfb');
+      var x = M;
+      row.cells.forEach(function (v, i) {
+        var s = typeof v === 'number' ? String(Math.round(v * 100) / 100) : String(v == null ? '' : v);
+        text(x + 3, y + 3.5, fit(s, 7, widths[i] - 6), 7, row.tot, row.tot ? NAVY : '#1e293b', aligns[i], widths[i] - 6);
+        x += widths[i];
+      });
+      hline(M, W - M, y + 13, '#e5eeee');
+      y += 13;
+    });
+    return y + 14;
+  }
+
+  var y = header(true);
+  rep.sheets.forEach(function (sh) { y = table(sh, y); });
+
+  var N = pages.length;
+  pages.forEach(function (p, i) {
+    ops = p;
+    rect(0, H - 4, W, 4, TEAL);
+    hline(M, W - M, H - 30, '#cbd5e1');
+    text(M, H - 22, 'SDMBRK', 8, true, NAVY);
+    text(M + 42, H - 22, 'Collections', 8, false, TEAL_D);
+    text(W - M - 180, H - 22, 'Taormina Village-01  |  Page ' + (i + 1) + ' of ' + N, 7, false, '#64748b', 'r', 180);
+  });
+
+  var objs = [], kids = [];
+  objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+  objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  pages.forEach(function (p, i) {
+    var cNum = 5 + i * 2, pNum = 6 + i * 2, stream = p.join('\n');
+    objs[cNum] = '<< /Length ' + stream.length + ' >>\nstream\n' + stream + '\nendstream';
+    objs[pNum] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + cNum + ' 0 R >>';
+    kids.push(pNum + ' 0 R');
+  });
+  objs[2] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + pages.length + ' >>';
+
+  var out = '%PDF-1.4\n', offs = [], k;
+  for (k = 1; k < objs.length; k++) {
+    offs[k] = out.length;
+    out += k + ' 0 obj\n' + objs[k] + '\nendobj\n';
+  }
+  var xref = out.length, n2 = objs.length;
+  out += 'xref\n0 ' + n2 + '\n0000000000 65535 f \n';
+  for (k = 1; k < n2; k++) out += ('0000000000' + offs[k]).slice(-10) + ' 00000 n \n';
+  out += 'trailer\n<< /Size ' + n2 + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+  return new Blob([out], { type: 'application/pdf' });
+}
+
+/* ---- Excel writer (.xlsx, built-in zip store) ---- */
+function crc32(buf) {
+  if (!crc32.t) {
+    var t = [];
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    crc32.t = t;
+  }
+  var crc = 0xFFFFFFFF;
+  for (var i = 0; i < buf.length; i++) crc = crc32.t[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function zipFiles(files) {
+  var parts = [], central = [], offset = 0, DOSDATE = 23918;
+  files.forEach(function (f) {
+    var nameB = f.nameB, data = f.data, crc = crc32(data);
+    var lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0, true);
+    lh.setUint16(8, 0, true); lh.setUint16(10, 0, true); lh.setUint16(12, DOSDATE, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true);
+    lh.setUint16(26, nameB.length, true); lh.setUint16(28, 0, true);
+    parts.push(new Uint8Array(lh.buffer), nameB, data);
+    var ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0, true); ch.setUint16(10, 0, true); ch.setUint16(12, 0, true); ch.setUint16(14, DOSDATE, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+    ch.setUint16(28, nameB.length, true); ch.setUint16(30, 0, true); ch.setUint16(32, 0, true);
+    ch.setUint16(34, 0, true); ch.setUint16(36, 0, true); ch.setUint32(38, 0, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nameB);
+    offset += 30 + nameB.length + data.length;
+  });
+  var cdSize = central.reduce(function (a, b) { return a + b.length; }, 0);
+  var end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+  end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+function xmlEsc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+function colName(i) {
+  var s = '';
+  i = i + 1;
+  while (i > 0) { var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); }
+  return s;
+}
+function cellV(ref, v, style) {
+  if (typeof v === 'number' && isFinite(v)) return '<c r="' + ref + '" s="' + style + '"><v>' + v + '</v></c>';
+  return '<c r="' + ref + '" s="' + style + '" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v == null ? '' : v) + '</t></is></c>';
+}
+function sheetXml(sh) {
+  var cols = sh.widths.map(function (w, i) {
+    return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + (w / 6).toFixed(1) + '" customWidth="1"/>';
+  }).join('');
+  var rowsX = [];
+  rowsX.push('<row r="1">' + cellV('A1', sh.title, 2) + '</row>');
+  rowsX.push('<row r="3">' + sh.headers.map(function (h, i) { return cellV(colName(i) + '3', h, 1); }).join('') + '</row>');
+  sh.rows.forEach(function (r, ri) {
+    var rr = ri + 4;
+    rowsX.push('<row r="' + rr + '">' + r.map(function (v, i) { return cellV(colName(i) + rr, v, typeof v === 'number' ? 3 : 0); }).join('') + '</row>');
+  });
+  if (sh.total) {
+    var tr = sh.rows.length + 4;
+    rowsX.push('<row r="' + tr + '">' + sh.total.map(function (v, i) { return cellV(colName(i) + tr, v, typeof v === 'number' ? 4 : 2); }).join('') + '</row>');
+  }
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<sheetViews><sheetView workbookViewId="0"><pane ySplit="3" topLeftCell="A4" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' +
+    '<cols>' + cols + '</cols><sheetData>' + rowsX.join('') + '</sheetData></worksheet>';
+}
+function makeXlsx(rep) {
+  var enc = new TextEncoder(), sheets = rep.sheets, H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  var RELNS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  var ct = H + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+    sheets.map(function (s, i) { return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('') +
+    '</Types>';
+  var rels = H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="' + RELNS + '/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  var wb = H + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + RELNS + '"><sheets>' +
+    sheets.map(function (s, i) { return '<sheet name="' + xmlEsc(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>'; }).join('') +
+    '</sheets></workbook>';
+  var wbRels = H + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    sheets.map(function (s, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="' + RELNS + '/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>'; }).join('') +
+    '<Relationship Id="rId100" Type="' + RELNS + '/styles" Target="styles.xml"/></Relationships>';
+  var styles = H + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<numFmts count="0"/>' +
+    '<fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font>' +
+    '<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>' +
+    '<fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FF0F2747"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    '<cellXfs count="5">' +
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+    '<xf numFmtId="0" fontId="2" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" vertical="center"/></xf>' +
+    '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+    '<xf numFmtId="2" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+    '<xf numFmtId="2" fontId="1" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1"/>' +
+    '</cellXfs></styleSheet>';
+  var files = [
+    { nameB: enc.encode('[Content_Types].xml'), data: enc.encode(ct) },
+    { nameB: enc.encode('_rels/.rels'), data: enc.encode(rels) },
+    { nameB: enc.encode('xl/workbook.xml'), data: enc.encode(wb) },
+    { nameB: enc.encode('xl/_rels/workbook.xml.rels'), data: enc.encode(wbRels) },
+    { nameB: enc.encode('xl/styles.xml'), data: enc.encode(styles) }
+  ];
+  sheets.forEach(function (s, i) {
+    var nm = 'xl/worksheets/sheet' + (i + 1) + '.xml';
+    files.push({ nameB: enc.encode(nm), data: enc.encode(sheetXml(s)) });
+  });
+  return zipFiles(files);
+}
+
+function exportReport(fileType, kind, date, scope) {
+  var rep = buildReport(kind, date, scope);
+  var base = 'TV01 Wire ' + (kind === 'daily' ? 'Daily' : 'Until now') + ' ' + date + ' ' + (scope || 'All TH');
+  try {
+    if (fileType === 'pdf') download(base + '.pdf', makePdf(rep));
+    else download(base + '.xlsx', makeXlsx(rep));
+    toast((fileType === 'pdf' ? 'PDF' : 'Excel') + ' report downloaded');
+  } catch (e) { toast('Report failed: ' + e.message, true); }
+}
+
+function sheetTable(sh, cap) {
+  var cell = function (v, i) { return td(typeof v === 'number' ? fmt(v) : String(v), sh.aligns[i] === 'r' ? 'num' : null); };
+  var rows = sh.rows.slice(0, cap || 80).map(function (r) { return el('tr', {}, r.map(cell)); });
+  if (sh.total) rows.push(el('tr', { class: 'total' }, sh.total.map(cell)));
+  return el('div', { class: 'table-wrap' }, [el('table', {}, [
+    el('thead', {}, [el('tr', {}, sh.headers.map(function (h, i) { return th(h, sh.aligns[i] === 'r' ? 'num' : null); }))]),
+    el('tbody', {}, rows)
+  ])]);
+}
+
+/* issue log preview: one small card per TH and day, villas listed under it */
+function isIssueSheet(sh) { return sh.headers.indexOf('Villa') >= 0 && sh.headers.indexOf('Size (sqmm)') >= 0; }
+function issueCards(sh) {
+  var groups = {}, order = [];
+  sh.rows.forEach(function (r) {
+    if (r[3] === '' || r[3] === undefined) return;   /* empty-state row */
+    var key = r[0] + '|' + r[1];
+    if (!groups[key]) { groups[key] = { date: r[0], th: r[1], villas: {}, vOrder: [], total: 0 }; order.push(key); }
+    var g = groups[key], vk = String(r[2]), s = String(r[3]), q = Number(r[4]) || 0;
+    if (!g.villas[vk]) { g.villas[vk] = { sizes: {}, sOrder: [], to: r[5] || '', total: 0 }; g.vOrder.push(vk); }
+    var v = g.villas[vk];
+    if (!v.sizes[s]) { v.sizes[s] = 0; v.sOrder.push(s); }
+    v.sizes[s] += q; v.total += q; g.total += q;
+  });
+  if (!order.length) return el('p', { class: 'hint', text: 'No wire issued in this selection' });
+  return el('div', {}, [
+    el('div', { class: 'icards' }, order.map(function (k) {
+      var g = groups[k];
+      return el('div', { class: 'icard' }, [
+        el('div', { class: 'icard-h' }, [
+          el('b', { text: g.th }),
+          el('span', { class: 'note', text: fdate(g.date) }),
+          el('span', { class: 'pill p-teal', text: fmt(round2(g.total)) + ' rolls' })
+        ]),
+        el('div', { class: 'ivil' }, g.vOrder.map(function (vk) {
+          var v = g.villas[vk];
+          return el('div', { class: 'irow' }, [
+            el('span', { class: 'vn', text: vk }),
+            el('span', { class: 'isz' }, v.sOrder.map(function (sz) {
+              return el('span', {}, [sz + ': ', el('b', { text: fmt(round2(v.sizes[sz])) })]);
+            })),
+            el('span', { class: 'note', text: v.to ? v.to + ' · ' + fmt(round2(v.total)) : fmt(round2(v.total)) })
+          ]);
+        }))
+      ]);
+    })),
+    sh.total ? el('p', { class: 'hint', style: 'margin-top:10px', text: 'Total ' + fmt(sh.total[4]) + ' rolls' }) : null
+  ]);
+}
+
+function viewReports() {
+  var box = el('div');
+  var kind = ui.rKind, date = ui.rDate || localDate(), scope = ui.rScope;
+  if (scope && thList().indexOf(scope) < 0) { scope = ''; ui.rScope = ''; }
+  var rep = buildReport(kind, date, scope);
+
+  box.appendChild(el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [
+      el('span', { class: 'eyebrow', text: 'Reports' }),
+      el('h2', { text: 'Daily and until-now reports' }),
+      el('p', { class: 'hint', text: 'Daily = wire issued on one day. Until now = balance status and issue log up to the chosen date. Download as PDF (A4) or Excel (.xlsx).' })
+    ])]),
+    el('div', { class: 'sec' }, [
+      step(1, 'Report type'),
+      el('div', { class: 'seg' }, [
+        el('button', { class: kind === 'daily' ? 'on' : null, onclick: function () { ui.rKind = 'daily'; render(); } }, ['Daily report']),
+        el('button', { class: kind === 'until' ? 'on' : null, onclick: function () { ui.rKind = 'until'; render(); } }, ['Until now'])
+      ])
+    ]),
+    el('div', { class: 'sec' }, [
+      step(2, kind === 'daily' ? 'Day' : 'Status as of'),
+      el('div', { class: 'grid-chips' }, [
+        el('input', { type: 'date', class: 'txt', value: date, style: 'max-width:220px', onchange: function () { ui.rDate = this.value || localDate(); render(); } }),
+        chip('Today', date === localDate(), function () { ui.rDate = localDate(); render(); }, true)
+      ])
+    ]),
+    el('div', { class: 'sec' }, [
+      step(3, 'Scope'),
+      el('div', { class: 'grid-chips' }, [chip('All TH', !scope, function () { ui.rScope = ''; render(); }, true)]
+        .concat(thList().map(function (t) { return chip(t, t === scope, function () { ui.rScope = t; render(); }, true); })))
+    ]),
+    el('div', { class: 'kpis' }, rep.kpis.map(function (k) { return kpiCard(k[1], k[0], '#0d9488', null); })),
+    el('div', { class: 'export-row' }, [
+      el('button', { class: 'btn primary', text: 'Download PDF', onclick: function () { exportReport('pdf', kind, date, scope); } }),
+      el('button', { class: 'btn ghost', text: 'Download Excel', onclick: function () { exportReport('xlsx', kind, date, scope); } })
+    ]),
+    el('p', { class: 'hint', text: 'The export also includes: ' + rep.sheets.slice(1).map(function (s) { return s.name; }).join(', ') + '.' })
+  ]));
+
+  box.appendChild(el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Preview' }), el('h2', { text: rep.sheets[0].title })])]),
+    isIssueSheet(rep.sheets[0]) ? issueCards(rep.sheets[0]) : sheetTable(rep.sheets[0], 80),
+    !isIssueSheet(rep.sheets[0]) && rep.sheets[0].rows.length > 80 ? el('p', { class: 'hint', text: 'Showing the first 80 rows. The export has all of them.' }) : null
+  ]));
+  return box;
+}
+
+/* ---------- shell ---------- */
+/* ---------- ACCOUNTS, ROLES, LOGIN (accounts live on the server; passwords are hashed there) ---------- */
+var ROLES = [
+  { k: 'admin', n: 'Admin' }, { k: 'storekeeper', n: 'Storekeeper' }, { k: 'foreman', n: 'Foreman' },
+  { k: 'chargehand', n: 'Chargehand' }, { k: 'engineer', n: 'Engineer' }
+];
+/* edit = full access, view = read only, none = tab hidden */
+var ROLE_PERMS = {
+  admin:       { report: 'edit', issues: 'edit', wirein: 'edit', blocks: 'edit', types: 'edit', reports: 'edit', data: 'edit', access: 'edit' },
+  storekeeper: { report: 'view', issues: 'edit', wirein: 'edit', blocks: 'view', types: 'view', reports: 'view' },
+  foreman:     { report: 'view', issues: 'edit', wirein: 'view', blocks: 'view', types: 'view', reports: 'view' },
+  chargehand:  { report: 'view', wirein: 'view', blocks: 'view', types: 'view', reports: 'view' },
+  engineer:    { report: 'view', issues: 'view', wirein: 'view', blocks: 'view', types: 'view', reports: 'view' }
+};
+var me = null;   /* { u: username, role } of the signed-in user */
+var pendingIn = null, pendingOut = null;
+
+function roleName(k) { var r = ROLES.filter(function (x) { return x.k === k; })[0]; return r ? r.n : k; }
+function permFor(tabKey) { return me && ROLE_PERMS[me.role] ? (ROLE_PERMS[me.role][tabKey] || 'none') : 'none'; }
+function adminCount() { return SRV.users.filter(function (x) { return x.role === 'admin'; }).length; }
+function canWriteStore() { return !!me && (me.role === 'admin' || me.role === 'storekeeper'); }
+function canRequestOut() { return !!me && me.role === 'foreman'; }
+
+function viewLogin() {
+  var first = !SRV.hasUsers;
+  var uIn = el('input', { type: 'text', class: 'txt', placeholder: 'Username', autocomplete: 'username' });
+  var pIn = el('input', { type: 'password', class: 'txt', placeholder: 'Password', autocomplete: first ? 'new-password' : 'current-password' });
+  var p2 = first ? el('input', { type: 'password', class: 'txt', placeholder: 'Confirm password', autocomplete: 'new-password' }) : null;
+  var go = function () {
+    var name = uIn.value.trim().toLowerCase(), pw = pIn.value;
+    if (!name) { toast('Enter username', true); return; }
+    if (first) {
+      if (pw.length < 4) { toast('Password must be at least 4 characters', true); return; }
+      if (p2.value !== pw) { toast('Passwords do not match', true); return; }
+      rpc('wt_bootstrap_admin', { p_user: name, p_pw: pw }).then(function (r) {
+        SRV.hasUsers = true; toast('Admin account created'); return startSession(r.token);
+      }).catch(function (err) { toast(err.message, true); });
+      return;
+    }
+    rpc('wt_login', { p_user: name, p_pw: pw }).then(function (r) {
+      toast('Signed in as ' + r.username); return startSession(r.token);
+    }).catch(function (err) { toast(err.message, true); });
+  };
+  pIn.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') go(); });
+  return el('div', { class: 'card login' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [
+      el('span', { class: 'eyebrow', text: first ? 'First start' : 'Sign in' }),
+      el('h2', { text: first ? 'Create the admin account' : 'Wire Issue Tracker' }),
+      el('p', { class: 'hint', text: first
+        ? 'No users exist yet. The first account is the administrator, who creates the other users and their roles.'
+        : 'Sign in with the username and password your administrator gave you.' })
+    ])]),
+    el('div', { class: 'sec' }, [field('Username', uIn)]),
+    el('div', { class: 'sec' }, [field('Password', pIn)].concat(p2 ? [field('Confirm password', p2)] : [])),
+    el('div', { style: 'margin-top:14px;text-align:right' }, [el('button', { class: 'btn primary', text: first ? 'Create admin account' : 'Sign in', onclick: go })])
+  ]);
+}
+
+function viewAccess() {
+  var box = el('div');
+  var nu = el('input', { type: 'text', class: 'txt', placeholder: 'e.g. ahmed.foreman' });
+  var np = el('input', { type: 'password', class: 'txt', placeholder: 'At least 4 characters' });
+  var nr = el('select', { class: 'txt' }, ROLES.map(function (r) { return opt(r.k, r.n, r.k === 'storekeeper'); }));
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Admin' }), el('h2', { text: 'Add user' }),
+      el('p', { class: 'hint', text: 'Give each person a username, a password and a role. They sign in with these details and get the role assigned here.' })])]),
+    el('div', { class: 'form-grid' }, [field('Username', nu), field('Password', np), field('Role', nr)]),
+    el('div', { style: 'margin-top:14px;text-align:right' }, [el('button', { class: 'btn primary', text: 'Add user', onclick: function () {
+      var name = nu.value.trim().toLowerCase(), pw = np.value, role = nr.value;
+      if (!/^[a-z0-9._-]{3,}$/.test(name)) { toast('Username: 3+ letters, digits, . _ or -', true); return; }
+      if (pw.length < 4) { toast('Password must be at least 4 characters', true); return; }
+      act(function () {
+        return rpc('wt_create_user', { p_token: SRV.token, p_user: name, p_pw: pw, p_role: role })
+          .then(function () { toast('User ' + name + ' added'); });
+      });
+    } })])
+  ]));
+
+  var rows = SRV.users.map(function (x) {
+    var isMe = x.username === me.u;
+    var pwIn = el('input', { type: 'password', class: 'txt', placeholder: 'New password' });
+    var roleSel = el('select', { class: 'txt', onchange: function () {
+      var newRole = this.value;
+      act(function () {
+        return rpc('wt_set_role', { p_token: SRV.token, p_user: x.username, p_role: newRole })
+          .then(function () { toast(x.username + ' is now ' + roleName(newRole)); });
+      });
+    } }, ROLES.map(function (r) { return opt(r.k, r.n, r.k === x.role); }));
+    var setPw = el('button', { class: 'btn ghost sm', text: 'Set', onclick: function () {
+      var pv = pwIn.value;
+      if (pv.length < 4) { toast('Password must be at least 4 characters', true); return; }
+      act(function () {
+        return rpc('wt_set_password', { p_token: SRV.token, p_user: x.username, p_pw: pv })
+          .then(function () { toast('Password changed for ' + x.username + '. They sign in again with it.'); });
+      });
+    } });
+    var lastAdmin = x.role === 'admin' && adminCount() <= 1;
+    return el('div', { class: 'bcard', style: 'padding:14px;gap:10px' }, [
+      el('div', { class: 'bcard-h' }, [
+        el('b', { text: x.username + (isMe ? '  (you)' : '') }),
+        el('span', { class: 'pill p-teal', text: roleName(x.role) })
+      ]),
+      el('div', { class: 'form-grid' }, [field('Role', roleSel),
+        field('Reset password', el('div', { class: 'grid-chips' }, [pwIn, setPw]))]),
+      el('div', { class: 'cfoot' }, [
+        el('span', { class: 'note', text: isMe ? 'Signed in now' : '' }),
+        isMe || lastAdmin ? el('span', { class: 'pill p-neutral', text: 'Cannot delete' })
+          : armBtn('Delete', function () {
+            act(function () {
+              return rpc('wt_delete_user', { p_token: SRV.token, p_user: x.username }).then(function () { toast('User removed'); });
+            });
+          })
+      ])
+    ]);
+  });
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Access control' }), el('h2', { text: 'Users · ' + SRV.users.length })])]),
+    el('div', { class: 'blocks-grid compact' }, rows)
+  ]));
+
+  var perm = el('div', { class: 'table-wrap' }, [el('table', {}, [
+    el('thead', {}, [el('tr', {}, ['Area', 'Admin', 'Storekeeper', 'Foreman', 'Chargehand', 'Engineer'].map(function (h) { return th(h); }))]),
+    el('tbody', {}, [
+      ['Overview (report, requests, activity)', 'report'], ['Wire Out (issue / request)', 'issues'], ['Blocks & villas', 'blocks'],
+      ['Villa types', 'types'], ['Reports (daily / until now)', 'reports'], ['Backup & log', 'data'], ['Access control', 'access']
+    ].map(function (pair) {
+      return el('tr', {}, [td(pair[0])].concat(ROLES.map(function (r) {
+        var p = ROLE_PERMS[r.k][pair[1]] || 'none';
+        return td(p === 'edit' ? 'Edit' : p === 'view' ? 'View' : '–', 'num');
+      })));
+    }))
+  ])]);
+  box.appendChild(el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Roles' }), el('h2', { text: 'What each role can do' }),
+      el('p', { class: 'hint', text: 'Storekeeper previews and saves wire in and wire out, and accepts or rejects foreman requests. Foreman requests stock out to a named person. Admin approves changes and manages users. Everyone else sees the report.' })])]),
+    perm
+  ]));
+  return box;
+}
+
+/* read-only roles: lock every control except those marked data-open */
+function lockView(root) {
+  root.querySelectorAll('input,textarea,select,button').forEach(function (e) {
+    if (e.closest && e.closest('[data-open]')) return;
+    e.disabled = true;
+  });
+}
+
+/* ---------- Overview: notices, requests, activity, wire in preview ---------- */
+function fmtTime(s) {
+  if (!s) return '';
+  var d = new Date(s);
+  if (isNaN(d.getTime())) return String(s);
+  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+/* rows: [{block, villa, size, colour, rolls}] -> one card per TH with its villas and colour totals */
+function lineSummary(rows) {
+  var byTh = {}, order = [];
+  rows.forEach(function (r) {
+    var t = thOf(r.block);
+    if (!byTh[t]) { byTh[t] = { vl: [], sizes: {}, total: 0 }; order.push(t); }
+    var g = byTh[t], vk = r.block + '|' + r.villa;
+    if (!g.vl.some(function (x) { return x.k === vk; })) g.vl.push({ k: vk, b: r.block, v: Number(r.villa) });
+    g.sizes[r.size] = g.sizes[r.size] || {};
+    g.sizes[r.size][r.colour] = (g.sizes[r.size][r.colour] || 0) + num(r.rolls);
+    g.total += num(r.rolls);
+  });
+  return el('div', { style: 'display:grid;gap:8px' }, order.map(function (t) {
+    var g = byTh[t];
+    return el('div', { class: 'wg' }, [
+      el('div', { class: 'wg-h' }, [
+        el('span', { class: 'pill ' + thPillClass(t), text: t }),
+        el('span', { class: 'note', text: g.vl.length + ' villa' + (g.vl.length === 1 ? '' : 's') }),
+        el('b', { class: 'wq', text: fmt(round2(g.total)) + ' rolls' })
+      ]),
+      el('div', { class: 'grid-chips', style: 'margin:4px 0' }, g.vl.map(function (x) {
+        return el('span', { class: 'pill p-teal', text: villaLabel(x.b, x.v) + ' · ' + typeAt(blockOf(x.b), x.v) });
+      })),
+      el('div', {}, SIZES.filter(function (sz) { return g.sizes[sz]; }).map(function (sz) {
+        var sc = SIZE_COLOR[sz];
+        return el('div', { class: 'wi-row' }, [
+          el('span', { class: 'pill', style: 'background:' + sc + '22;color:' + sc, text: sz + ' sqmm' }),
+          el('div', { class: 'wg-e' }, CORE_COLORS.filter(function (c) { return g.sizes[sz][c.s]; }).map(function (c) {
+            return el('span', { class: 'went' }, [coreChip(c), el('b', { text: fmt(round2(g.sizes[sz][c.s])) })]);
+          }))
+        ]);
+      }))
+    ]);
+  }));
+}
+/* lines: a delivery's {size: {colour: rolls}} -> node and total */
+function linesBlock(lines) {
+  var total = 0;
+  var rows = SIZES.filter(function (sz) { return lines[sz]; }).map(function (sz) {
+    var sc = SIZE_COLOR[sz];
+    return el('div', { class: 'wi-row' }, [
+      el('span', { class: 'pill', style: 'background:' + sc + '22;color:' + sc, text: sz + ' sqmm' }),
+      el('div', { class: 'wg-e' }, CORE_COLORS.filter(function (c) { return lines[sz][c.s]; }).map(function (c) {
+        total += num(lines[sz][c.s]);
+        return el('span', { class: 'went' }, [coreChip(c), el('b', { text: fmt(round2(num(lines[sz][c.s]))) })]);
+      }))
+    ]);
+  });
+  return { node: el('div', { style: 'display:grid;gap:8px' }, rows), total: total };
+}
+
+function stockCard(s, canDecide) {
+  var pillCls = s.status === 'pending' ? 'p-pos' : s.status === 'accepted' ? 'p-ok' : 'p-over';
+  return el('div', { class: 'wg' }, [
+    el('div', { class: 'wg-h' }, [
+      el('span', { class: 'pill ' + pillCls, text: s.status }),
+      el('b', { class: 'wv', text: 'For ' + s.to_name }),
+      el('span', { class: 'note', text: 'By ' + s.requested_by + ' · ' + fmtTime(s.created_at) })
+    ]),
+    s.note ? el('span', { class: 'note', text: s.note }) : null,
+    lineSummary(s.items || []),
+    canDecide && s.status === 'pending' ? el('div', { class: 'grid-chips', style: 'justify-content:flex-end;margin-top:8px' }, [
+      el('button', { class: 'btn ghost sm', text: 'Reject', onclick: function () {
+        act(function () { return rpc('wt_decide_stock_out', { p_token: SRV.token, p_req: s.id, p_accept: false }).then(function () { toast('Request rejected'); }); });
+      } }),
+      el('button', { class: 'btn primary sm', text: 'Accept and stock out', onclick: function () {
+        act(function () { return rpc('wt_decide_stock_out', { p_token: SRV.token, p_req: s.id, p_accept: true }).then(function () { toast('Stock out recorded'); }); });
+      } })
+    ]) : null
+  ]);
+}
+
+function changeCard(c, canDecide) {
+  var e = SRV.entries.filter(function (x) { return x.id === c.entry_id; })[0];
+  var what = !e ? 'Entry #' + c.entry_id + ' (already removed)'
+    : e.kind === 'in' ? 'Wire in · ' + (e.ref || 'delivery')
+    : thOf(e.block) + ' · ' + villaLabel(e.block, Number(e.villa)) + ' · ' + e.size + ' sqmm ' + e.colour + ' · now ' + fmt(round2(num(e.rolls))) + ' rolls';
+  var ask = c.action === 'delete' ? 'Delete this entry' : 'Change to ' + fmt(round2(num(c.new_rolls))) + ' rolls';
+  var pillCls = c.status === 'pending' ? 'p-pos' : c.status === 'approved' ? 'p-ok' : 'p-over';
+  return el('div', { class: 'wg' }, [
+    el('div', { class: 'wg-h' }, [
+      el('span', { class: 'pill ' + pillCls, text: c.status }),
+      el('b', { class: 'wv', text: ask }),
+      el('span', { class: 'note', text: 'By ' + c.requested_by + ' · ' + fmtTime(c.created_at) })
+    ]),
+    el('span', { class: 'note', text: what }),
+    canDecide && c.status === 'pending' ? el('div', { class: 'grid-chips', style: 'justify-content:flex-end;margin-top:8px' }, [
+      el('button', { class: 'btn ghost sm', text: 'Reject', onclick: function () {
+        act(function () { return rpc('wt_decide_change', { p_token: SRV.token, p_req: c.id, p_approve: false }).then(function () { toast('Change rejected'); }); });
+      } }),
+      el('button', { class: 'btn primary sm', text: 'Approve', onclick: function () {
+        act(function () { return rpc('wt_decide_change', { p_token: SRV.token, p_req: c.id, p_approve: true }).then(function () { toast('Change approved'); }); });
+      } })
+    ]) : null
+  ]);
+}
+
+function ovRequests() {
+  var rows = [];
+  if (canWriteStore()) SRV.stock.filter(function (s) { return s.status === 'pending'; }).forEach(function (s) { rows.push(stockCard(s, true)); });
+  if (canRequestOut()) SRV.stock.filter(function (s) { return s.requested_by === me.u; }).slice(-6).reverse().forEach(function (s) { rows.push(stockCard(s, false)); });
+  if (me.role === 'admin') SRV.changes.filter(function (c) { return c.status === 'pending'; }).forEach(function (c) { rows.push(changeCard(c, true)); });
+  if (me.role === 'storekeeper') SRV.changes.filter(function (c) { return c.requested_by === me.u; }).slice(-6).reverse().forEach(function (c) { rows.push(changeCard(c, false)); });
+  if (!rows.length) return null;
+  return el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Requests' }),
+      el('h2', { text: me.role === 'admin' || me.role === 'storekeeper' ? 'Waiting for action' : 'My requests' })])]),
+    el('div', { class: 'blocks-grid compact' }, rows)
+  ]);
+}
+
+function ovNotice() {
+  if (!SRV.notes.length) return null;
+  return el('div', { class: 'card notice', 'data-open': '1' }, [
+    el('div', { class: 'notice-h' }, [
+      el('b', { text: 'New updates' }),
+      el('button', { class: 'btn ghost sm', text: 'Mark seen', onclick: function () { SRV.notes = []; render(); } })
+    ]),
+    el('ul', { class: 'notice-list' }, SRV.notes.slice(0, 6).map(function (n) { return el('li', { text: n }); }))
+  ]);
+}
+
+/* one card per save: wire in deliveries, and wire out grouped by request or by saving action */
+function ovActivity() {
+  var groups = {}, order = [];
+  SRV.entries.slice().sort(function (a, b) { return b.id - a.id; }).forEach(function (e) {
+    var key = e.kind === 'in' ? 'in' + e.id
+      : e.request_id ? 'req' + e.request_id
+      : 'out|' + e.created_by + '|' + String(e.created_at || '').slice(0, 16);
+    if (!groups[key]) {
+      groups[key] = { kind: e.kind, by: e.created_by, at: e.created_at, req: e.request_id, to: e.to_name, remarks: e.remarks, ref: e.ref, lines: e.lines, rows: [] };
+      order.push(key);
+    }
+    groups[key].rows.push(e);
+  });
+  var cards = order.slice(0, 12).map(function (k) {
+    var g = groups[k];
+    if (g.kind === 'in') {
+      var lb = linesBlock(g.lines || {});
+      return el('div', { class: 'wg' }, [
+        el('div', { class: 'wg-h' }, [el('span', { class: 'pill p-ok', text: 'Wire in' }), el('b', { class: 'wv', text: g.ref || 'Delivery' }),
+          el('b', { class: 'wq', text: fmt(round2(lb.total)) + ' rolls' })]),
+        el('span', { class: 'note', text: 'Saved by ' + g.by + ' · ' + fmtTime(g.at) + (g.remarks ? ' · ' + g.remarks : '') }),
+        lb.node
+      ]);
+    }
+    var tot = 0; g.rows.forEach(function (r) { tot += num(r.rolls); });
+    return el('div', { class: 'wg' }, [
+      el('div', { class: 'wg-h' }, [el('span', { class: 'pill ' + (g.req ? 'p-teal' : 'p-pos'), text: g.req ? 'Stock out (accepted)' : 'Wire out' }),
+        el('b', { class: 'wv', text: 'To ' + (g.to || '—') }), el('b', { class: 'wq', text: fmt(round2(tot)) + ' rolls' })]),
+      el('span', { class: 'note', text: (g.req ? 'Accepted by storekeeper' : 'Saved by ' + g.by) + ' · ' + fmtTime(g.at) + (g.remarks ? ' · ' + g.remarks : '') }),
+      lineSummary(g.rows)
+    ]);
+  });
+  return el('div', { class: 'card' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Activity' }), el('h2', { text: 'Latest wire in and wire out' })]),
+      el('p', { class: 'hint', text: 'One card per save. Saved entries are locked; changes go through the admin.' })]),
+    cards.length ? el('div', { class: 'blocks-grid compact' }, cards) : el('div', { class: 'empty', text: 'Nothing saved yet.' })
+  ]);
+}
+
+function wiPreview() {
+  var p = pendingIn;
+  var lb = linesBlock(p.lines);
+  return el('div', { class: 'card preview-card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [
+      el('span', { class: 'eyebrow', text: 'Preview · not saved yet' }),
+      el('h2', { text: 'Confirm delivery to store' }),
+      el('p', { class: 'hint', text: 'Check the quantities. After you confirm, this delivery is saved and locked. Changes need the admin.' })
+    ])]),
+    el('div', { class: 'note', text: fdate(p.date) + (p.ref ? ' · ' + p.ref : '') + (p.remarks ? ' · ' + p.remarks : '') + ' · ' + fmt(round2(lb.total)) + ' rolls' }),
+    el('div', { class: 'sec' }, [lb.node]),
+    el('div', { class: 'grid-chips', style: 'justify-content:flex-end;margin-top:14px' }, [
+      el('button', { class: 'btn ghost', text: 'Edit', onclick: function () {
+        wiDraft = { date: p.date, ref: p.ref, remarks: p.remarks, lines: p.lines };
+        pendingIn = null; wiOpen = true; render();
+      } }),
+      el('button', { class: 'btn primary', text: 'Confirm and save', onclick: function () {
+        act(function () {
+          return rpc('wt_add_entries', { p_token: SRV.token, p_rows: [{ kind: 'in', entry_date: p.date, ref: p.ref, remarks: p.remarks, lines: p.lines }] })
+            .then(function () { pendingIn = null; wiDraft = null; wiOpen = false; toast('Delivery saved and locked · ' + fmt(round2(lb.total)) + ' rolls'); });
+        });
+      } })
+    ])
+  ]);
+}
+
+/* Wire Out preview: storekeeper saves the lines; foreman sends them as a stock-out request */
+function outPreview() {
+  var p = pendingOut, req = p.mode === 'req';
+  var tot = 0; p.rows.forEach(function (r) { tot += num(r.rolls); });
+  var clearDraft = function () { draft.picks = []; draft.cr = zeroSizeCr(); draft.remarks = ''; };
+  return el('div', { class: 'card preview-card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [
+      el('span', { class: 'eyebrow', text: req ? 'Request · not sent yet' : 'Preview · not saved yet' }),
+      el('h2', { text: req ? 'Stock-out request for ' + p.to : 'Confirm wire out' }),
+      el('p', { class: 'hint', text: req
+        ? 'The storekeeper accepts or rejects this. Stock is taken out only after acceptance.'
+        : 'After you confirm, these lines are saved and locked. Changes need the admin.' })
+    ])]),
+    el('div', { class: 'note', text: fdate(p.date) + (p.to ? ' · ' + (req ? 'for ' : 'to ') + p.to : '') + (p.remarks ? ' · ' + p.remarks : '') + ' · ' + p.rows.length + ' lines · ' + fmt(round2(tot)) + ' rolls' }),
+    el('div', { class: 'sec' }, [lineSummary(p.rows)]),
+    el('div', { class: 'grid-chips', style: 'justify-content:flex-end;margin-top:14px' }, [
+      el('button', { class: 'btn ghost', text: 'Back to edit', onclick: function () { pendingOut = null; render(); } }),
+      el('button', { class: 'btn primary', text: req ? 'Send request' : 'Confirm and save', onclick: function () {
+        if (req) {
+          act(function () {
+            return rpc('wt_request_stock_out', { p_token: SRV.token, p_to: p.to, p_items: p.rows, p_note: p.remarks })
+              .then(function () { pendingOut = null; clearDraft(); toast('Request sent to the storekeeper'); });
+          });
+        } else {
+          act(function () {
+            var rows = p.rows.map(function (r) {
+              return { kind: 'out', entry_date: p.date, block: r.block, villa: r.villa, size: r.size, colour: r.colour, rolls: r.rolls, to_name: p.to, remarks: p.remarks };
+            });
+            return rpc('wt_add_entries', { p_token: SRV.token, p_rows: rows })
+              .then(function () { pendingOut = null; clearDraft(); toast('Wire out saved and locked · ' + fmt(round2(tot)) + ' rolls'); });
+          });
+        }
+      } })
+    ])
+  ]);
+}
+
+/* edits and deletes of saved entries: the admin applies them at once; storekeeper sends a request */
+function changeEntry(id, action, newRolls) {
+  var direct = me.role === 'admin';
+  act(function () {
+    return rpc('wt_request_change', { p_token: SRV.token, p_entry: id, p_action: action, p_new_rolls: newRolls, p_reason: '' })
+      .then(function (reqId) {
+        if (!direct) { toast('Sent to the admin for approval'); return; }
+        return rpc('wt_decide_change', { p_token: SRV.token, p_req: reqId, p_approve: true })
+          .then(function () { toast(action === 'delete' ? 'Entry deleted' : 'Entry updated'); });
+      });
+  });
+}
+
+function ovSection() {
+  var box = el('div');
+  if (!S.blocks.length) box.appendChild(el('div', { class: 'card notice', 'data-open': '1' }, [
+    el('b', { text: 'Blocks and villa types are not set up yet.' }),
+    el('p', { class: 'hint', text: 'The admin signs in once to create them in the shared store. Until then there is nothing to issue against.' })
+  ]));
+  [ovNotice(), ovRequests()].forEach(function (n) { if (n) box.appendChild(n); });
+  box.appendChild(ovSizeCard());
+  if (pendingIn) box.appendChild(wiPreview());
+  else if (wiOpen && canWireIn()) box.appendChild(wiForm());
+  box.appendChild(ovActivity());
+  box.appendChild(el('div', { class: 'card', 'data-open': canWriteStore() ? '1' : null }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'History' }), el('h2', { text: 'Wire in log' })])]),
+    wiLog()
+  ]));
+  return box;
+}
+
+/* ---------- shell ---------- */
+function render() {
+  var nav = $('nav'), app = $('app'), who = $('who');
+  nav.innerHTML = ''; app.innerHTML = ''; who.innerHTML = '';
+  if (!SRV.booted) { app.appendChild(el('div', { class: 'empty', text: 'Connecting to the shared store…' })); return; }
+  if (!me || !SRV.token) { app.appendChild(viewLogin()); return; }
+  who.appendChild(el('span', { class: 'whotxt', text: me.u + ' · ' + roleName(me.role) }));
+  who.appendChild(el('button', { class: 'btn ghost sm', text: 'Log out', onclick: logout }));
+  var tabs = TABS.filter(function (t) { return permFor(t[0]) !== 'none'; });
+  if (!tabs.some(function (t) { return t[0] === tab; })) tab = tabs[0][0];
+  tabs.forEach(function (t) {
+    var label = t[1] + (t[0] === 'report' && SRV.unseen ? '  ●' + SRV.unseen : '');
+    nav.appendChild(el('button', { class: tab === t[0] ? 'on' : null, text: label, onclick: function () { tab = t[0]; render(); } }));
+  });
+  var v = tab === 'report' ? viewReport() : tab === 'issues' ? viewIssues() : tab === 'blocks' ? viewBlocks() : tab === 'types' ? viewTypes() : tab === 'reports' ? viewReports() : tab === 'access' ? viewAccess() : viewData();
+  app.appendChild(v);
+  if (tab === 'report') SRV.unseen = 0;
+  if (permFor(tab) === 'view') lockView(app);
+}
+
+$('ver').textContent = 'v' + APP_VERSION;
+render();
+boot();
+
+</script>
+</body>
+</html>
