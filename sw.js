@@ -51,12 +51,23 @@ self.addEventListener('push', function (e) {
   e.waitUntil(self.registration.showNotification(data.title || 'Wire Tracker', opts));
 });
 self.addEventListener('notificationclick', function (e) {
-  e.notification.close();
-  var url = (e.notification.data && e.notification.data.url) || './';
-  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].url.indexOf(self.registration.scope) === 0 && 'focus' in list[i]) return list[i].focus();
+  /* Tapping the card or its Open button both come here. Open the app (or focus its open tab) at the link in the notification. */
+  var n = e.notification;
+  var target = new URL((n.data && n.data.url) || './', self.registration.scope).href;
+  n.close();
+  e.waitUntil((async function () {
+    try {
+      var list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].url.indexOf(self.registration.scope) === 0) {
+          await list[i].focus();
+          if (list[i].navigate && list[i].url !== target) { try { await list[i].navigate(target); } catch (err) {} }
+          return;
+        }
+      }
+      await self.clients.openWindow(target);
+    } catch (err) {
+      await self.clients.openWindow(target);
     }
-    return self.clients.openWindow(url);
-  }));
+  })());
 });
