@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.1.2</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.2.0</title>
 <style>
+.voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
+.voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.voice-txt{width:100%;margin-top:8px}
+.voice-res{margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0}
+.voice-res .voice-row{margin-top:4px}
 :root{
   --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
   --ink:#14213d;--muted:#64748b;--line:#e2e8f0;--bg:#f1f7f7;
@@ -302,16 +307,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.1.2</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.2.0</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.1.2';
+var APP_VERSION = '2.2.0';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
-var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
+var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.2.0', d: '2026-11-14', t: 'Voice entry: on Wire in and Wire Out, tap Speak and say, for example, "stock in 2.5 red 10 yellow 5, 4 blue 3" or "stock out 2.5 red 10 black 4 to Ahmed". The words are shown as a result with each size, colour and roll count, and can be corrected before you use them. Stock in opens the preview, and nothing is saved until the storekeeper confirms. Stock out fills the Wire Out form, then you choose TH and villas and press Preview. Voice works in Chrome, Edge, Samsung Internet and Safari (iPhone); other browsers can type the words. Trial tab (admin): send sample alerts to your devices, and view the app as another user (read only).' },
   { v: '2.1.2', d: '2026-11-14', t: 'Admin can delete any stock-in (wire in) or stock-out (wire out) entry directly, including wire out created from an accepted stock-out request. The delete is recorded in the change history as approved by the admin. Storekeeper deletes still go to the admin for approval.' },
   { v: '2.1.1', d: '2026-11-14', t: 'Delete confirmations now name the exact entry: each wire in and wire out row shows its number (#), date, delivery note and rolls, and the Type DELETE prompt repeats them. Wire in rows without a delivery note are labelled "no delivery note". Pending change cards show the same details.' },
   { v: '2.1.0', d: '2026-11-14', t: 'Rich notifications. With alerts turned on (the Enable alerts button in the header), your phone or computer shows a notification even when the app is closed. Foreman gets each wire in and wire out with TH, villa, size, colour and rolls. Storekeeper gets each stock-out request. Admin gets change requests. The person who asked is told when a stock-out or change is accepted, rejected or approved. iPhone: first add the app to the Home Screen (iOS 16.4 or later), open it from the icon, then turn on alerts.' },
@@ -552,6 +558,7 @@ var SRV = {
 };
 
 function rpc(name, body) {
+  if (VIEW_AS && !/^wt_(who|get_state|list_users|has_users|role)$/.test(name)) return Promise.reject(new Error('Viewing as ' + VIEW_AS.u + ' is read only. Go back to admin to make changes.'));
   return fetch(API_URL + '/rest/v1/rpc/' + name, {
     method: 'POST',
     headers: { 'apikey': API_KEY, 'Content-Type': 'application/json' },
@@ -955,6 +962,7 @@ function wiForm() {
   return el('div', { class: 'card', 'data-open': '1' }, [
     el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Store' }), el('h2', { text: 'Wire in from delivery' }),
       el('p', { class: 'hint', text: 'Enter the rolls received for each colour and size. You will see a preview before anything is saved.' })])]),
+    voiceCard('in'),
     el('div', { class: 'form-grid' }, [field('Date', dateIn), field('Delivery note', refIn), field('Remarks', remIn)]),
     el('div', { class: 'sec' }, sizeRows),
     el('div', { style: 'margin-top:12px;text-align:right' }, [el('button', { class: 'btn primary', text: 'Preview delivery', onclick: function () {
@@ -1253,6 +1261,7 @@ function colourRank(i) { var c = coreByCode(i.colour); return c ? CORE_COLORS.in
 function viewIssues() {
   var box = el('div');
   if (pendingOut) box.appendChild(outPreview());
+  else if (canWriteStore() || canRequestOut()) box.appendChild(voiceCard('out'));
   var d = draft;
   var ths = thList();
   if (d.th && ths.indexOf(d.th) < 0) { d.th = ''; d.picks = []; }
@@ -2223,7 +2232,7 @@ var ROLES = [
 ];
 /* edit = full access, view = read only, none = tab hidden */
 var ROLE_PERMS = {
-  admin:       { report: 'edit', issues: 'edit', wirein: 'edit', blocks: 'edit', types: 'edit', reports: 'edit', data: 'edit', access: 'edit' },
+  admin:       { report: 'edit', issues: 'edit', wirein: 'edit', blocks: 'edit', types: 'edit', reports: 'edit', data: 'edit', access: 'edit', trial: 'edit' },
   storekeeper: { report: 'view', issues: 'edit', wirein: 'edit', blocks: 'view', types: 'view', reports: 'view' },
   foreman:     { report: 'view', issues: 'edit', wirein: 'view', blocks: 'view', types: 'view', reports: 'view' },
   chargehand:  { report: 'view', wirein: 'view', blocks: 'view', types: 'view', reports: 'view' },
@@ -2633,6 +2642,196 @@ function ovSection() {
 }
 
 /* ---------- shell ---------- */
+/* ---------- Voice entry: say stock in / stock out with sizes, colours and rolls ---------- */
+var SpeechRec = (typeof window !== 'undefined') && (window.SpeechRecognition || window.webkitSpeechRecognition) || null;
+var voiceSt = { in: { text: '', listening: false, note: '' }, out: { text: '', listening: false, note: '' } };
+var VOICE_NUM = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90, hundred: 100 };
+var VOICE_COL = { red: 'R', r: 'R', yellow: 'Y', y: 'Y', blue: 'B', b: 'B', black: 'BK', bk: 'BK', green: 'YG', yg: 'YG' };
+var VOICE_SKIP = { stock: 1, wire: 1, 'in': 1, out: 1, the: 1, a: 1, of: 1, sqmm: 1, sq: 1, mm: 1, square: 1, millimetre: 1, millimetres: 1, millimeter: 1, millimeters: 1, rolls: 1, roll: 1, qty: 1, quantity: 1, each: 1, and: 1, 'with': 1, is: 1, size: 1, colour: 1, color: 1, please: 1, add: 1, then: 1, also: 1, at: 1, 'sqmm,': 1 };
+
+function voiceNormalise(t) {
+  var s = ' ' + String(t || '').toLowerCase().replace(/[,;]+/g, ' ').replace(/\s+/g, ' ') + ' ';
+  s = s.replace(/\s(\d+)\s+and\s+a\s+half\b/g, function (m, a) { return ' ' + (Number(a) + 0.5) + ' '; });
+  s = s.replace(/\sand\s+a\s+half\b/g, ' .5 ');
+  var words = s.split(' ').map(function (w) { return VOICE_NUM[w] !== undefined ? String(VOICE_NUM[w]) : (w === 'point' ? '.' : w); });
+  s = ' ' + words.join(' ') + ' ';
+  s = s.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2').replace(/\s\.(\d)/g, ' 0.$1');
+  s = s.replace(/(\d+(?:\.\d+)?)\s*(sqmm|sq\.?\s*mm|mm)\b/g, '$1 ');
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function voiceParse(text, kind) {
+  var raw = voiceNormalise(text);
+  var mode = /\b(stock|wire) out\b/.test(raw) || / out /.test(' ' + raw + ' ') ? 'out'
+    : /\b(stock|wire) in\b/.test(raw) || / in /.test(' ' + raw + ' ') ? 'in' : kind;
+  var nm = raw.match(/\b(?:to|for)\s+([a-z][a-z .'-]*?)(?=\s+(?:th|red|yellow|blue|black|green|bk|yg|\d+(?:\.\d+)?)\b|\s*$)/);
+  var name = nm ? nm[1].trim().replace(/\b\w/g, function (c) { return c.toUpperCase(); }) : '';
+  var body = nm ? raw.replace(nm[0], ' ') : raw;
+  var tokens = body.split(' ').filter(Boolean);
+  var lines = {}, notes = [], size = null, pc = null, skipNum = false, total = 0;
+  var colName = function (c) { var x = CORE_COLORS.filter(function (k) { return k.s === c; })[0]; return x ? x.n : c; };
+  for (var i = 0; i < tokens.length; i++) {
+    var t = tokens[i];
+    if (skipNum && /^\d+(\.\d+)?$/.test(t)) { skipNum = false; continue; }
+    if (t === 'th') { skipNum = true; continue; }
+    if (t === 'yellow' && tokens[i + 1] === 'green') { pc = 'YG'; i++; continue; }
+    if (VOICE_COL[t]) { if (pc) notes.push('no quantity for ' + colName(pc)); pc = VOICE_COL[t]; continue; }
+    if (/^\d+(\.\d+)?$/.test(t)) {
+      if (pc) {
+        var q = Math.round(parseFloat(t) * 2) / 2;
+        if (!size) notes.push('no size for ' + colName(pc) + ' ' + t);
+        else if (q > 0) { lines[size] = lines[size] || {}; lines[size][pc] = (lines[size][pc] || 0) + q; total += q; }
+        pc = null; continue;
+      }
+      if (SIZES.indexOf(t) >= 0) { size = t; continue; }
+      notes.push('number ' + t + ' is not a size (2.5, 4 or 6)'); continue;
+    }
+    if (VOICE_SKIP[t]) continue;
+    var note = 'unclear "' + t + '"';
+    if (notes.indexOf(note) < 0) notes.push(note);
+  }
+  if (pc) notes.push('no quantity for ' + colName(pc));
+  return { mode: mode, lines: lines, name: name, notes: notes, total: round2(total) };
+}
+
+function voiceListen(kind) {
+  var st = voiceSt[kind];
+  if (st.listening) return;
+  if (!SpeechRec) { toast('Voice is not available in this browser. Type the words instead.', true); return; }
+  var rec;
+  try { rec = new SpeechRec(); } catch (e) { toast('Voice could not start in this browser. Type the words instead.', true); return; }
+  rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
+  st.listening = true; st.note = ''; render();
+  rec.onresult = function (ev) { st.text = ev.results[0][0].transcript; st.listening = false; render(); };
+  rec.onerror = function (ev) {
+    st.listening = false;
+    st.note = ev.error === 'not-allowed' ? 'The microphone is blocked. Allow it in the browser settings, then try again.'
+      : ev.error === 'no-speech' ? 'No speech was heard. Tap Speak and try again.'
+      : 'Voice stopped (' + ev.error + '). You can type the words instead.';
+    render();
+  };
+  rec.onend = function () { if (st.listening) { st.listening = false; render(); } };
+  try { rec.start(); } catch (e) { st.listening = false; st.note = 'Could not start the microphone. Try again.'; render(); }
+}
+
+function voiceReset(kind) { voiceSt[kind] = { text: '', listening: false, note: '' }; }
+
+function voiceUseIn(p) {
+  var d = wiDraft || (wiDraft = wiNew());
+  var lines = {};
+  SIZES.forEach(function (sz) { if (p.lines[sz]) lines[sz] = Object.assign({}, p.lines[sz]); });
+  pendingIn = { date: d.date || localDate(), ref: (d.ref || '').trim(), remarks: (d.remarks || '').trim(), lines: lines };
+  voiceReset('in');
+  render();
+  window.scrollTo(0, 0);
+}
+
+function voiceUseOut(p) {
+  draft.sizes = SIZES.filter(function (sz) { return p.lines[sz]; });
+  draft.mode = 'custom';
+  draft.cr = zeroSizeCr();
+  draft.sizes.forEach(function (sz) { CORE_COLORS.forEach(function (c) { if (p.lines[sz][c.s]) draft.cr[sz][c.s] = p.lines[sz][c.s]; }); });
+  if (p.name && canRequestOut()) draft.to = p.name;
+  voiceReset('out');
+  tab = 'issues';
+  render();
+  toast('Filled from your voice. Choose the TH and villas, then press Preview. Each selected villa gets these rolls.');
+}
+
+function voiceResult(kind, p) {
+  var rows = SIZES.filter(function (sz) { return p.lines[sz]; }).map(function (sz) {
+    var sum = 0;
+    CORE_COLORS.forEach(function (c) { sum += p.lines[sz][c.s] || 0; });
+    return el('div', { class: 'voice-row' }, [
+      sizeDot(sz), el('b', { text: sz + ' sqmm' }),
+      el('span', { class: 'note', text: CORE_COLORS.filter(function (c) { return p.lines[sz][c.s]; }).map(function (c) { return c.n + ' ' + fmt(round2(p.lines[sz][c.s])); }).join(' · ') }),
+      el('span', { class: 'wq', text: fmt(round2(sum)) + ' rolls' })
+    ]);
+  });
+  var head = el('div', { class: 'voice-row' }, [
+    el('span', { class: 'pill ' + (p.mode === 'in' ? 'p-ok' : 'p-over'), text: p.mode === 'in' ? 'Stock in' : 'Stock out' }),
+    p.name ? el('b', { text: 'to ' + p.name }) : null,
+    el('span', { class: 'wq', text: fmt(p.total) + ' rolls total' })
+  ]);
+  var notes = p.notes.length ? el('p', { class: 'hint', text: 'Not understood: ' + p.notes.join(' · ') + '. Correct the words above and check again.' }) : null;
+  var action = null;
+  if (!p.total) action = el('p', { class: 'hint', text: 'Nothing recognised yet. Try: "stock in 2.5 red 10 yellow 5, 4 blue 3".' });
+  else if (p.mode === 'in') {
+    action = kind === 'in' && canWireIn()
+      ? el('button', { class: 'btn primary sm', text: 'Use for stock in and preview', onclick: function () { voiceUseIn(p); } })
+      : el('p', { class: 'hint', text: 'Stock in is entered on the Overview page, under Wire in.' });
+  } else {
+    action = kind === 'out' && (canWriteStore() || canRequestOut())
+      ? el('button', { class: 'btn primary sm', text: canRequestOut() ? 'Use for stock-out request' : 'Use for stock out', onclick: function () { voiceUseOut(p); } })
+      : el('p', { class: 'hint', text: 'Stock out is entered on the Wire Out tab.' });
+  }
+  return el('div', { class: 'voice-res' }, [head].concat(rows, [notes, el('div', { class: 'grid-chips', style: 'margin-top:8px' }, [
+    action, el('button', { class: 'btn ghost sm', text: 'Clear', onclick: function () { voiceReset(kind); render(); } })
+  ])]));
+}
+
+function voiceCard(kind) {
+  var st = voiceSt[kind];
+  var p = st.text.trim() ? voiceParse(st.text, kind) : null;
+  return el('div', { class: 'voice-card' }, [
+    el('div', { class: 'voice-row' }, [
+      el('b', { text: 'Voice entry' }),
+      el('span', { class: 'note', text: SpeechRec ? 'Tap Speak, say it, check the result, then confirm.' : 'Voice is not available in this browser. Type the words instead.' })
+    ]),
+    el('div', { class: 'voice-row' }, [
+      el('button', { class: 'btn primary sm', text: st.listening ? 'Listening…' : 'Speak', onclick: function () { voiceListen(kind); } }),
+      el('span', { class: 'hint', text: 'Example: ' + (kind === 'in' ? '"stock in 2.5 red 10 yellow 5, 4 blue 3"' : '"stock out 2.5 red 10 black 4 to Ahmed"') })
+    ]),
+    el('textarea', { class: 'txt voice-txt', rows: '2', placeholder: 'Or type here', onchange: function () { st.text = this.value; render(); } }, [st.text]),
+    st.note ? el('p', { class: 'hint', text: st.note }) : null,
+    p ? voiceResult(kind, p) : null
+  ]);
+}
+
+/* ---------- Trial area (admin): test alerts and view the app as another user ---------- */
+var VIEW_AS = null;   /* { u, role, real } while viewing as another user; nothing can be saved */
+var TEST_ALERTS = [['in', 'Wire in'], ['out', 'Wire out'], ['request', 'Stock-out request'], ['accepted', 'Stock-out accepted'], ['change', 'Change request']];
+function sendTestAlert(kind) {
+  rpc('wt_test_alert', { p_token: SRV.token, p_kind: kind })
+    .then(function (n) { toast(n ? 'Test sent to ' + n + ' device' + (n > 1 ? 's' : '') + '. It should arrive in a few seconds.' : 'This admin has no device with alerts on. Tap Enable alerts in the header first.', !n); })
+    .catch(function (e) { toast(e.message || String(e), true); });
+}
+function startViewAs(u) {
+  VIEW_AS = { u: u.username, role: u.role, real: me.role };
+  me.role = u.role;
+  tab = 'report';
+  render();
+  toast('Viewing as ' + u.username + '. Read only.');
+}
+function stopViewAs() {
+  if (!VIEW_AS) return;
+  me.role = VIEW_AS.real; VIEW_AS = null; tab = 'trial'; render();
+}
+function viewTrial() {
+  var box = el('div');
+  if (VIEW_AS) box.appendChild(el('div', { class: 'card notice', 'data-open': '1' }, [
+    el('b', { text: 'Viewing as ' + VIEW_AS.u + ' (' + roleName(VIEW_AS.role) + ')' }),
+    el('p', { class: 'hint', text: 'Read only: nothing can be saved or changed while you view as another user.' }),
+    el('button', { class: 'btn primary sm', text: 'Back to admin', onclick: stopViewAs })
+  ]));
+  box.appendChild(el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Trial' }), el('h2', { text: 'Check alerts' }),
+      el('p', { class: 'hint', text: 'Sends a sample alert to this admin\'s devices, so you can see how each notification looks. Turn on alerts in the header first.' })])]),
+    el('div', { class: 'grid-chips' }, TEST_ALERTS.map(function (t) {
+      return el('button', { class: 'btn ghost sm', text: t[1], onclick: function () { sendTestAlert(t[0]); } });
+    }))
+  ]));
+  var others = SRV.users.filter(function (x) { return x.username !== me.u; });
+  box.appendChild(el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Trial' }), el('h2', { text: 'Act as a user' }),
+      el('p', { class: 'hint', text: 'See the app as another user would see it. This is a read-only preview; no data is changed.' })])]),
+    others.length ? el('div', { class: 'grid-chips' }, others.map(function (x) {
+      return el('button', { class: 'btn ghost sm', text: x.username + ' · ' + roleName(x.role), onclick: function () { startViewAs(x); } });
+    })) : el('p', { class: 'hint', text: 'No other users yet. Create users under Access control.' })
+  ]));
+  return box;
+}
+
 function render() {
   var nav = $('nav'), app = $('app'), who = $('who');
   nav.innerHTML = ''; app.innerHTML = ''; who.innerHTML = '';
@@ -2648,7 +2847,7 @@ function render() {
     var label = t[1] + (t[0] === 'report' && SRV.unseen ? '  ●' + SRV.unseen : '');
     nav.appendChild(el('button', { class: tab === t[0] ? 'on' : null, text: label, onclick: function () { tab = t[0]; render(); } }));
   });
-  var v = tab === 'report' ? viewReport() : tab === 'issues' ? viewIssues() : tab === 'blocks' ? viewBlocks() : tab === 'types' ? viewTypes() : tab === 'reports' ? viewReports() : tab === 'access' ? viewAccess() : viewData();
+  var v = tab === 'report' ? viewReport() : tab === 'issues' ? viewIssues() : tab === 'blocks' ? viewBlocks() : tab === 'types' ? viewTypes() : tab === 'reports' ? viewReports() : tab === 'access' ? viewAccess() : tab === 'trial' ? viewTrial() : viewData();
   app.appendChild(v);
   if (tab === 'report') SRV.unseen = 0;
   if (permFor(tab) === 'view') lockView(app);
