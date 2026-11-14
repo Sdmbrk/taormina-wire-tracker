@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.2.0</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.0</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -307,16 +307,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.2.0</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.0</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.2.0';
+var APP_VERSION = '2.3.0';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.0', d: '2026-11-14', t: 'Google sign-in. The admin adds each person\'s Gmail address under Access control (also when adding a user). On the sign-in screen, Sign in with Google signs the person in when that address is registered, and they get their existing role. Unregistered Google accounts are turned away. Password sign-in still works.' },
   { v: '2.2.0', d: '2026-11-14', t: 'Voice entry: on Wire in and Wire Out, tap Speak and say, for example, "stock in 2.5 red 10 yellow 5, 4 blue 3" or "stock out 2.5 red 10 black 4 to Ahmed". The words are shown as a result with each size, colour and roll count, and can be corrected before you use them. Stock in opens the preview, and nothing is saved until the storekeeper confirms. Stock out fills the Wire Out form, then you choose TH and villas and press Preview. Voice works in Chrome, Edge, Samsung Internet and Safari (iPhone); other browsers can type the words. Trial tab (admin): send sample alerts to your devices, and view the app as another user (read only).' },
   { v: '2.1.2', d: '2026-11-14', t: 'Admin can delete any stock-in (wire in) or stock-out (wire out) entry directly, including wire out created from an accepted stock-out request. The delete is recorded in the change history as approved by the admin. Storekeeper deletes still go to the admin for approval.' },
   { v: '2.1.1', d: '2026-11-14', t: 'Delete confirmations now name the exact entry: each wire in and wire out row shows its number (#), date, delivery note and rolls, and the Type DELETE prompt repeats them. Wire in rows without a delivery note are labelled "no delivery note". Pending change cards show the same details.' },
@@ -557,11 +558,11 @@ var SRV = {
   known: null, notes: [], unseen: 0, busy: false, pending: 0, chain: Promise.resolve()
 };
 
-function rpc(name, body) {
+function rpc(name, body, bearer) {
   if (VIEW_AS && !/^wt_(who|get_state|list_users|has_users|role)$/.test(name)) return Promise.reject(new Error('Viewing as ' + VIEW_AS.u + ' is read only. Go back to admin to make changes.'));
   return fetch(API_URL + '/rest/v1/rpc/' + name, {
     method: 'POST',
-    headers: { 'apikey': API_KEY, 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'apikey': API_KEY, 'Content-Type': 'application/json' }, bearer ? { 'Authorization': 'Bearer ' + bearer } : {}),
     body: JSON.stringify(body || {})
   }).then(function (res) {
     return res.text().then(function (txt) {
@@ -798,6 +799,12 @@ function boot() {
   try { t = sessionStorage.getItem(TOKEN_KEY); } catch (e) {}
   rpc('wt_has_users', {}).then(function (h) {
     SRV.hasUsers = !!h;
+    if (GOOGLE_ERR) toast(GOOGLE_ERR, true);
+    if (GOOGLE_TOKEN) {
+      var gt = GOOGLE_TOKEN; GOOGLE_TOKEN = null;
+      return rpc('wt_login_google', {}, gt).then(function (r) { toast('Signed in as ' + r.username); return startSession(r.token); })
+        .catch(function (err) { toast(err.message, true); });
+    }
     if (!t) return;
     SRV.token = t;
     return refresh(false).then(function () { if (!me) SRV.token = null; });
@@ -2278,7 +2285,11 @@ function viewLogin() {
     ])]),
     el('div', { class: 'sec' }, [field('Username', uIn)]),
     el('div', { class: 'sec' }, [field('Password', pIn)].concat(p2 ? [field('Confirm password', p2)] : [])),
-    el('div', { style: 'margin-top:14px;text-align:right' }, [el('button', { class: 'btn primary', text: first ? 'Create admin account' : 'Sign in', onclick: go })])
+    el('div', { style: 'margin-top:14px;text-align:right' }, [el('button', { class: 'btn primary', text: first ? 'Create admin account' : 'Sign in', onclick: go })]),
+    first ? null : el('div', { class: 'sec', style: 'margin-top:18px' }, [
+      el('button', { class: 'btn ghost', text: 'Sign in with Google', style: 'width:100%', onclick: googleLogin }),
+      el('p', { class: 'hint', text: 'Use this if the admin has added your Gmail address to your account.' })
+    ])
   ]);
 }
 
@@ -2287,17 +2298,20 @@ function viewAccess() {
   var nu = el('input', { type: 'text', class: 'txt', placeholder: 'e.g. ahmed.foreman' });
   var np = el('input', { type: 'password', class: 'txt', placeholder: 'At least 4 characters' });
   var nr = el('select', { class: 'txt' }, ROLES.map(function (r) { return opt(r.k, r.n, r.k === 'storekeeper'); }));
+  var nE = el('input', { type: 'email', class: 'txt', placeholder: 'Optional: name@gmail.com' });
   box.appendChild(el('div', { class: 'card' }, [
     el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Admin' }), el('h2', { text: 'Add user' }),
       el('p', { class: 'hint', text: 'Give each person a username, a password and a role. They sign in with these details and get the role assigned here.' })])]),
-    el('div', { class: 'form-grid' }, [field('Username', nu), field('Password', np), field('Role', nr)]),
+    el('div', { class: 'form-grid' }, [field('Username', nu), field('Password', np), field('Role', nr), field('Google email', nE)]),
     el('div', { style: 'margin-top:14px;text-align:right' }, [el('button', { class: 'btn primary', text: 'Add user', onclick: function () {
       var name = nu.value.trim().toLowerCase(), pw = np.value, role = nr.value;
       if (!/^[a-z0-9._-]{3,}$/.test(name)) { toast('Username: 3+ letters, digits, . _ or -', true); return; }
       if (pw.length < 4) { toast('Password must be at least 4 characters', true); return; }
+      var em = nE.value.trim();
       act(function () {
         return rpc('wt_create_user', { p_token: SRV.token, p_user: name, p_pw: pw, p_role: role })
-          .then(function () { toast('User ' + name + ' added'); });
+          .then(function () { return em ? rpc('wt_set_email', { p_token: SRV.token, p_user: name, p_email: em }) : null; })
+          .then(function () { toast('User ' + name + ' added' + (em ? ' · Google sign-in: ' + em : '')); });
       });
     } })])
   ]));
@@ -2305,6 +2319,7 @@ function viewAccess() {
   var rows = SRV.users.map(function (x) {
     var isMe = x.username === me.u;
     var pwIn = el('input', { type: 'password', class: 'txt', placeholder: 'New password' });
+    var emIn = el('input', { type: 'email', class: 'txt', placeholder: 'name@gmail.com', value: x.email || '' });
     var roleSel = el('select', { class: 'txt', onchange: function () {
       var newRole = this.value;
       act(function () {
@@ -2327,7 +2342,13 @@ function viewAccess() {
         el('span', { class: 'pill p-teal', text: roleName(x.role) })
       ]),
       el('div', { class: 'form-grid' }, [field('Role', roleSel),
-        field('Reset password', el('div', { class: 'grid-chips' }, [pwIn, setPw]))]),
+        field('Reset password', el('div', { class: 'grid-chips' }, [pwIn, setPw])),
+        field('Google email', el('div', { class: 'grid-chips' }, [emIn, el('button', { class: 'btn ghost sm', text: 'Save', onclick: function () {
+          act(function () {
+            return rpc('wt_set_email', { p_token: SRV.token, p_user: x.username, p_email: emIn.value.trim() })
+              .then(function () { toast(emIn.value.trim() ? 'Google email saved for ' + x.username : 'Google email removed for ' + x.username); });
+          });
+        } })]))]),
       el('div', { class: 'cfoot' }, [
         el('span', { class: 'note', text: isMe ? 'Signed in now' : '' }),
         isMe || lastAdmin ? el('span', { class: 'pill p-neutral', text: 'Cannot delete' })
@@ -2642,6 +2663,24 @@ function ovSection() {
 }
 
 /* ---------- shell ---------- */
+/* ---------- Google sign-in: read the result Google/Supabase returns in the address ---------- */
+var GOOGLE_TOKEN = null, GOOGLE_ERR = '';
+(function () {
+  var h = location.hash || '';
+  if (h.indexOf('access_token=') >= 0) {
+    var m = h.match(/access_token=([^&]+)/);
+    if (m) GOOGLE_TOKEN = decodeURIComponent(m[1]);
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  } else if (h.indexOf('error_description=') >= 0) {
+    var em = h.match(/error_description=([^&]+)/);
+    GOOGLE_ERR = decodeURIComponent((em ? em[1] : 'Google sign-in failed').replace(/\+/g, ' '));
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  }
+})();
+function googleLogin() {
+  location.href = API_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(location.origin + location.pathname);
+}
+
 /* ---------- Voice entry: say stock in / stock out with sizes, colours and rolls ---------- */
 var SpeechRec = (typeof window !== 'undefined') && (window.SpeechRecognition || window.webkitSpeechRecognition) || null;
 var voiceSt = { in: { text: '', listening: false, note: '' }, out: { text: '', listening: false, note: '' } };
