@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.6</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.7</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.6</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.7</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.6';
+var APP_VERSION = '2.3.7';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.7', d: '2026-11-15', t: 'Daily PDF report has a Villa wise table: for the selected date, each villa (or whole-TH issue) with rolls per size, colour split, total and who it was issued to, with a total row.' },
   { v: '2.3.6', d: '2026-11-15', t: 'Notification cards show the wire details on the card itself: size, colour, rolls, location, people and references, in a coloured layout per kind. If the card cannot be drawn, the plain banner is used.' },
   { v: '2.3.5', d: '2026-11-15', t: 'Tapping a notification card (or its Open button) now always opens the app at the link, or brings the open app to the front. Errors are no longer silent.' },
   { v: '2.3.4', d: '2026-11-15', t: 'Push notifications are card-style: each kind has its own coloured banner and accent colour (wire in teal, wire out orange, stock-out request purple, accepted green, change request red), the details are on separate lines, and an Open button opens the app. Test alerts use the same cards.' },
@@ -1810,6 +1811,30 @@ function statusSheet(scope, asOf, name, title) {
   return mkSheet(name, title, headers, rows, total, 'No TH to show');
 }
 
+/* Villa wise: one row per villa (or whole-TH issue) with rolls per size, colour split and who it went to, for the selected day */
+function villaWiseSheet(list, asOf, name) {
+  var map = {}, order = [];
+  list.forEach(function (i) {
+    var vk = (i.villa === '' || i.villa === null || i.villa === undefined) ? '' : String(i.villa);
+    var key = i.block + '|' + vk;
+    if (!map[key]) { map[key] = { th: thOf(i.block), block: i.block, villa: vk, sums: { '2.5': 0, '4': 0, '6': 0 }, cols: {}, to: [] }; order.push(key); }
+    var m = map[key], sz = String(i.size), r = iR(i);
+    m.sums[sz] = (m.sums[sz] || 0) + r;
+    m.cols[i.colour] = (m.cols[i.colour] || 0) + r;
+    if (i.to && m.to.indexOf(i.to) < 0) m.to.push(i.to);
+  });
+  var rows = order.map(function (k) {
+    var m = map[k], whole = m.villa === '';
+    var colTxt = Object.keys(m.cols).map(function (c) { return c + ' ' + fmt(round2(m.cols[c])); }).join(' \u00b7 ');
+    var tot = round2(m.sums['2.5'] + m.sums['4'] + m.sums['6']);
+    return [m.th, m.block, whole ? 'Whole TH' : 'V' + pad(thVillaNo(m.block, m.villa)), round2(m.sums['2.5']), round2(m.sums['4']), round2(m.sums['6']), tot, colTxt, m.to.join(', ')];
+  });
+  var t = [0, 0, 0, 0];
+  rows.forEach(function (r) { for (var q = 0; q < 4; q++) t[q] += r[3 + q]; });
+  var total = ['Total', '', '', round2(t[0]), round2(t[1]), round2(t[2]), round2(t[3]), '', ''];
+  return mkSheet('Villa wise', 'Wire issued per villa on ' + fdate(asOf) + ' - ' + name,
+    ['TH', 'Block', 'Villa', '2.5 sqmm', '4 sqmm', '6 sqmm', 'Total', 'Colours', 'Issued to'], rows, total, 'No wire issued in this selection');
+}
 function issuesList(scope, pred) {
   return S.issues.filter(function (i) { return (!scope || thOf(i.block) === scope) && pred(i); })
     .sort(function (a, b) {
@@ -1853,6 +1878,7 @@ function buildReport(kind, asOf, scope) {
       kpis: [['Date', fdate(asOf)], ['Issues', String(list.length)], ['Rolls issued', fmt(rollsTotal) + ' rolls'], ['TH issued', String(dRows.length)]],
       sheets: [
         issuesSheet('Issues on day', 'Wire issued on ' + fdate(asOf) + ' - ' + name, list),
+        villaWiseSheet(list, asOf, name),
         mkSheet('Day totals', 'Rolls issued on ' + fdate(asOf) + ' by TH', ['TH', '2.5 sqmm (rolls)', '4 sqmm (rolls)', '6 sqmm (rolls)', 'Total (rolls)'], dRows, dT, 'No wire issued in this selection'),
         statusSheet(scope, asOf, 'Status at date', 'Balance status as of ' + fdate(asOf) + ' - ' + name)
       ]
