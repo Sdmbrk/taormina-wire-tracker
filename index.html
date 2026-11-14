@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.3</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.4</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.3</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.4</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.3';
+var APP_VERSION = '2.3.4';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.4', d: '2026-11-15', t: 'Push notifications are card-style: each kind has its own coloured banner and accent colour (wire in teal, wire out orange, stock-out request purple, accepted green, change request red), the details are on separate lines, and an Open button opens the app. Test alerts use the same cards.' },
   { v: '2.3.3', d: '2026-11-15', t: 'Trial: Check PDF print downloads a sample daily or until-now PDF made from sample wire in and wire out. It is built in memory and nothing is saved, so you can check the print layout safely.' },
   { v: '2.3.2', d: '2026-11-15', t: 'Reset all entries now clears every wire in and wire out entry, every stock request and every change request, so old notifications no longer come back. Users, blocks, villa types and requirements are kept. The backup is still downloaded first.' },
   { v: '2.3.1', d: '2026-11-15', t: 'The signed-in name and role now show in the top bar on phones too. On narrow screens the role is hidden and a long name is shortened, so the name stays visible next to Alerts and Log out.' },

@@ -23,18 +23,32 @@ self.addEventListener('fetch', function (e) {
   );
 });
 
-/* Rich notifications: the server sends a push with a title, body and link. */
+/* Card-style notifications: each kind gets its own colour banner, accent colour and an Open button.
+   The server sends title, body (lines separated by \n), tag, url and kind. */
+var CARD = {
+  in:       { color: '#0d9488', image: './icons/card-in.png' },
+  out:      { color: '#ea580c', image: './icons/card-out.png' },
+  request:  { color: '#6d28d9', image: './icons/card-request.png' },
+  accepted: { color: '#15803d', image: './icons/card-accepted.png' },
+  change:   { color: '#be123c', image: './icons/card-change.png' }
+};
 self.addEventListener('push', function (e) {
   var data = {};
   try { data = e.data ? e.data.json() : {}; } catch (err) { data = { title: 'Wire Tracker', body: e.data ? e.data.text() : '' }; }
-  e.waitUntil(self.registration.showNotification(data.title || 'Wire Tracker', {
+  var card = CARD[data.kind] || { color: '#0f766e', image: undefined };
+  var opts = {
     body: data.body || '',
     tag: data.tag || undefined,
     renotify: !!data.tag,
     icon: './icons/icon-192.png',
     badge: './icons/icon-192.png',
+    color: card.color,
+    image: card.image,
+    vibrate: [120, 60, 120],
+    actions: [{ action: 'open', title: 'Open' }],
     data: { url: data.url || './' }
-  }));
+  };
+  e.waitUntil(self.registration.showNotification(data.title || 'Wire Tracker', opts));
 });
 self.addEventListener('notificationclick', function (e) {
   e.notification.close();
