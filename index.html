@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.0.0</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.0.1</title>
 <style>
 :root{
   --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
@@ -284,7 +284,7 @@ footer b{color:var(--teal-d)}
 <body>
 <header>
   <div class="brand">
-    <div class="logo">W</div>
+    <div class="logo"><svg viewBox="0 0 42 42" width="42" height="42" role="img" aria-label="SDMBRK logo"><rect width="42" height="42" rx="13" fill="#fff"/><path d="M8 14 C16 7 26 21 34 14" stroke="#dc2626" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M8 21 C16 14 26 28 34 21" stroke="#eab308" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M8 28 C16 21 26 35 34 28" stroke="#2563eb" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
     <div>
       <h1>Taormina Village-01 · Wire Issue Tracker</h1>
       <p>Electrical store · cable issued by block and villa</p>
@@ -295,16 +295,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.0.0</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.0.1</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.0.0';
+var APP_VERSION = '2.0.1';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
 var CHANGELOG = [
+  { v: '2.0.1', d: '2026-11-14', t: 'Added the SDMBRK logo to the header: three wires in the red, yellow and blue core colours.' },
   { v: '2.0.0', d: '2026-11-14', t: 'Shared data. Every phone and computer now uses one shared store (Supabase, tables wt_*) and refreshes every 10 seconds. Accounts are kept on the server and passwords are stored as hashes, so they can no longer be shown; the admin resets them. Storekeeper previews each wire in or wire out and confirms it; a confirmed entry is saved and locked. Edits and deletes go to the admin for approval. Foreman requests stock out to a named person by TH, villa, size, colour and rolls; the storekeeper accepts and stock out is recorded automatically. New updates appear as notes and toasts, and the Overview shows requests and activity cards. Undo and redo are removed for shared data. Restoring an old backup file is switched off.' },
   { v: '1.13.6', d: '2026-11-14', t: 'Undo and Redo buttons at the top of every page step back and forward through data changes (wire out, wire in, blocks, villa types, deletes and resets). The last 50 changes are kept for this browser session.' },
   { v: '1.13.5', d: '2026-11-14', t: 'Every delete (wire out, wire in deliveries, blocks, villa types and users) asks you to type DELETE before it runs. Cancel keeps the item.' },
