@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.0</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.1</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -279,7 +279,8 @@ footer b{color:var(--teal-d)}
 .login{max-width:460px;margin:24px auto}
 @keyframes wblink{0%,100%{opacity:1}50%{opacity:.15}}
 .blink{animation:wblink 1s steps(2,start) infinite}
-@media (max-width:720px){ .who{font-size:12px;gap:6px} .who .whotxt{display:none} }
+.whotxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+@media (max-width:720px){ .who{font-size:12px;gap:6px} .who .whotxt{max-width:96px} .who .whorole{display:none} }
 .preview-card{border:2px solid #f97316}
 .notice{border:2px solid #0d9488;background:#f0fdfa}
 .notice-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
@@ -307,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.0</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.1</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.0';
+var APP_VERSION = '2.3.1';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.1', d: '2026-11-15', t: 'The signed-in name and role now show in the top bar on phones too. On narrow screens the role is hidden and a long name is shortened, so the name stays visible next to Alerts and Log out.' },
   { v: '2.3.0', d: '2026-11-14', t: 'Google sign-in. The admin adds each person\'s Gmail address under Access control (also when adding a user). On the sign-in screen, Sign in with Google signs the person in when that address is registered, and they get their existing role. Unregistered Google accounts are turned away. Password sign-in still works.' },
   { v: '2.2.0', d: '2026-11-14', t: 'Voice entry: on Wire in and Wire Out, tap Speak and say, for example, "stock in 2.5 red 10 yellow 5, 4 blue 3" or "stock out 2.5 red 10 black 4 to Ahmed". The words are shown as a result with each size, colour and roll count, and can be corrected before you use them. Stock in opens the preview, and nothing is saved until the storekeeper confirms. Stock out fills the Wire Out form, then you choose TH and villas and press Preview. Voice works in Chrome, Edge, Samsung Internet and Safari (iPhone); other browsers can type the words. Trial tab (admin): send sample alerts to your devices, and view the app as another user (read only).' },
   { v: '2.1.2', d: '2026-11-14', t: 'Admin can delete any stock-in (wire in) or stock-out (wire out) entry directly, including wire out created from an accepted stock-out request. The delete is recorded in the change history as approved by the admin. Storekeeper deletes still go to the admin for approval.' },
@@ -2876,7 +2878,10 @@ function render() {
   nav.innerHTML = ''; app.innerHTML = ''; who.innerHTML = '';
   if (!SRV.booted) { app.appendChild(el('div', { class: 'empty', text: 'Connecting to the shared store…' })); return; }
   if (!me || !SRV.token) { app.appendChild(viewLogin()); return; }
-  who.appendChild(el('span', { class: 'whotxt', text: me.u + ' · ' + roleName(me.role) }));
+  who.appendChild(el('span', { class: 'whotxt', title: me.u + ' · ' + roleName(me.role) }, [
+    el('span', { class: 'whouser', text: me.u }),
+    el('span', { class: 'whorole', text: ' · ' + roleName(me.role) })
+  ]));
   var pb = pushButton(); if (pb) who.appendChild(pb);
   if (!pushSynced) { pushSynced = true; syncPush(); }
   who.appendChild(el('button', { class: 'btn ghost sm', text: 'Log out', onclick: logout }));
