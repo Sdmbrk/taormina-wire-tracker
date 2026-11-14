@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.1.0</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.1.1</title>
 <style>
 :root{
   --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
@@ -302,16 +302,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.1.0</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.1.1</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.1.0';
+var APP_VERSION = '2.1.1';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
 var CHANGELOG = [
+  { v: '2.1.1', d: '2026-11-14', t: 'Delete confirmations now name the exact entry: each wire in and wire out row shows its number (#), date, delivery note and rolls, and the Type DELETE prompt repeats them. Wire in rows without a delivery note are labelled "no delivery note". Pending change cards show the same details.' },
   { v: '2.1.0', d: '2026-11-14', t: 'Rich notifications. With alerts turned on (the Enable alerts button in the header), your phone or computer shows a notification even when the app is closed. Foreman gets each wire in and wire out with TH, villa, size, colour and rolls. Storekeeper gets each stock-out request. Admin gets change requests. The person who asked is told when a stock-out or change is accepted, rejected or approved. iPhone: first add the app to the Home Screen (iOS 16.4 or later), open it from the icon, then turn on alerts.' },
   { v: '2.0.2', d: '2026-11-14', t: 'Installable app: the page now has a web app manifest, icons and a service worker. Android offers Install app; on iPhone, Add to Home Screen opens it full screen. Live data is never cached.' },
   { v: '2.0.1', d: '2026-11-14', t: 'Added the SDMBRK logo to the header: three wires in the red, yellow and blue core colours.' },
@@ -510,7 +511,7 @@ function toast(msg, bad) {
 }
 
 /* every delete asks for the word DELETE before it runs */
-function armBtn(label, onConfirm) {
+function armBtn(label, onConfirm, desc) {
   var b = el('button', { class: 'btn danger', text: label });
   b.addEventListener('click', function () {
     var row = null;
@@ -522,7 +523,7 @@ function armBtn(label, onConfirm) {
     var no = el('button', { class: 'btn ghost sm', text: 'Cancel', onclick: function () {
       if (row && row.parentNode) row.parentNode.replaceChild(b, row);
     } });
-    row = el('span', { class: 'del-row' }, [inp, ok, no]);
+    row = el('span', { class: 'del-row' }, [desc ? el('span', { class: 'note', text: 'Delete ' + desc + '?' }) : null, inp, ok, no]);
     if (b.parentNode) b.parentNode.replaceChild(row, b);
   });
   return b;
@@ -985,9 +986,11 @@ function wiLog() {
     out.push(el('div', { class: 'wg' }, [
       el('div', { class: 'wg-h' }, [
         el('b', { class: 'wv', text: r.ref || 'Delivery' }),
+        el('span', { class: 'note', text: '#' + r.id }),
         r.remarks ? el('span', { class: 'note', text: r.remarks }) : null,
         el('span', { class: 'wq', text: fmt(round2(lb.total)) + ' rolls' }),
-        canWriteStore() ? armBtn('×', function () { changeEntry(r.id, 'delete', null); }) : null
+        canWriteStore() ? armBtn('×', function () { changeEntry(r.id, 'delete', null); },
+          '#' + r.id + ' · ' + fdate(r.date) + ' · ' + (r.ref || 'no delivery note') + ' · ' + fmt(round2(lb.total)) + ' rolls') : null
       ]),
       lb.node
     ]));
@@ -1451,7 +1454,8 @@ function viewIssues() {
                   changeEntry(i.id, 'edit', q);
                 } })
               : el('b', { text: fmt(iR(i)) }),
-            canWriteStore() ? armBtn('×', function () { changeEntry(i.id, 'delete', null); }) : null
+            canWriteStore() ? armBtn('×', function () { changeEntry(i.id, 'delete', null); },
+              '#' + i.id + ' · ' + i.date + (i.to ? ' · ' + i.to : '') + ' · ' + fmt(iR(i)) + ' rolls') : null
           ]);
         }))
       ]));
@@ -2440,8 +2444,8 @@ function stockCard(s, canDecide) {
 function changeCard(c, canDecide) {
   var e = SRV.entries.filter(function (x) { return x.id === c.entry_id; })[0];
   var what = !e ? 'Entry #' + c.entry_id + ' (already removed)'
-    : e.kind === 'in' ? 'Wire in · ' + (e.ref || 'delivery')
-    : thOf(e.block) + ' · ' + villaLabel(e.block, Number(e.villa)) + ' · ' + e.size + ' sqmm ' + e.colour + ' · now ' + fmt(round2(num(e.rolls))) + ' rolls';
+    : e.kind === 'in' ? 'Wire in #' + e.id + ' · ' + fdate(e.entry_date) + ' · ' + (e.ref || 'no delivery note') + ' · ' + fmt(round2(num(e.rolls))) + ' rolls'
+    : '#' + e.id + ' · ' + thOf(e.block) + ' · ' + villaLabel(e.block, Number(e.villa)) + ' · ' + e.size + ' sqmm ' + e.colour + ' · now ' + fmt(round2(num(e.rolls))) + ' rolls';
   var ask = c.action === 'delete' ? 'Delete this entry' : 'Change to ' + fmt(round2(num(c.new_rolls))) + ' rolls';
   var pillCls = c.status === 'pending' ? 'p-pos' : c.status === 'approved' ? 'p-ok' : 'p-over';
   return el('div', { class: 'wg' }, [
