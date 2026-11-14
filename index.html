@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.2</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.3</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.2</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.3</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.2';
+var APP_VERSION = '2.3.3';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.3', d: '2026-11-15', t: 'Trial: Check PDF print downloads a sample daily or until-now PDF made from sample wire in and wire out. It is built in memory and nothing is saved, so you can check the print layout safely.' },
   { v: '2.3.2', d: '2026-11-15', t: 'Reset all entries now clears every wire in and wire out entry, every stock request and every change request, so old notifications no longer come back. Users, blocks, villa types and requirements are kept. The backup is still downloaded first.' },
   { v: '2.3.1', d: '2026-11-15', t: 'The signed-in name and role now show in the top bar on phones too. On narrow screens the role is hidden and a long name is shortened, so the name stays visible next to Alerts and Log out.' },
   { v: '2.3.0', d: '2026-11-14', t: 'Google sign-in. The admin adds each person\'s Gmail address under Access control (also when adding a user). On the sign-in screen, Sign in with Google signs the person in when that address is registered, and they get their existing role. Unregistered Google accounts are turned away. Password sign-in still works.' },
@@ -2849,6 +2850,30 @@ function stopViewAs() {
   if (!VIEW_AS) return;
   me.role = VIEW_AS.real; VIEW_AS = null; tab = 'trial'; render();
 }
+/* Sample wire in and out for checking the PDF print. Built in memory only: nothing is saved to the shared store, and the real data is put back afterwards. */
+function mockPdf(kind) {
+  if (!S.blocks || !S.blocks.length) { toast('Add a block first; the sample uses your first block', true); return; }
+  var b = S.blocks[0], d = new Date();
+  var today = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  var cols = ['R', 'Y', 'B', 'BK', 'YG'], lines = {};
+  SIZES.forEach(function (sz) { lines[sz] = {}; cols.forEach(function (c) { lines[sz][c] = 20; }); });
+  var receipts = [{ id: -1, date: today, ref: 'SAMPLE-IN', lines: lines, remarks: 'Sample wire in', by: me.u }];
+  var issues = [
+    { id: -2, date: today, block: b.block, villa: 1, size: '2.5', colour: 'R', rolls: 2, to: 'Sample person', remarks: 'Sample', ref: 'SAMPLE-OUT', by: me.u },
+    { id: -3, date: today, block: b.block, villa: 2, size: '4', colour: 'B', rolls: 1.5, to: 'Sample person', remarks: 'Sample', ref: 'SAMPLE-OUT', by: me.u },
+    { id: -4, date: today, block: b.block, villa: 2, size: '6', colour: 'BK', rolls: 3, to: 'Sample person', remarks: 'Sample', ref: 'SAMPLE-OUT', by: me.u }
+  ];
+  var saveI = S.issues, saveR = S.receipts;
+  try {
+    S.issues = issues; S.receipts = receipts;
+    var rep = buildReport(kind, today, null);
+    rep.title = 'SAMPLE - ' + rep.title;
+    download('MOCK TV01 Wire ' + (kind === 'daily' ? 'Daily' : 'Until now') + ' ' + today + '.pdf', makePdf(rep));
+    toast('Sample PDF downloaded. Nothing was saved.');
+  } catch (e) { toast('Sample PDF failed: ' + e.message, true); }
+  finally { S.issues = saveI; S.receipts = saveR; }
+}
+
 function viewTrial() {
   var box = el('div');
   if (VIEW_AS) box.appendChild(el('div', { class: 'card notice', 'data-open': '1' }, [
@@ -2870,6 +2895,14 @@ function viewTrial() {
     others.length ? el('div', { class: 'grid-chips' }, others.map(function (x) {
       return el('button', { class: 'btn ghost sm', text: x.username + ' · ' + roleName(x.role), onclick: function () { startViewAs(x); } });
     })) : el('p', { class: 'hint', text: 'No other users yet. Create users under Access control.' })
+  ]));
+  box.appendChild(el('div', { class: 'card', 'data-open': '1' }, [
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Trial' }), el('h2', { text: 'Check PDF print' }),
+      el('p', { class: 'hint', text: 'Downloads a sample PDF made from sample wire in and wire out on your first block. Nothing is saved, and your real data is not changed.' })])]),
+    el('div', { class: 'grid-chips' }, [
+      el('button', { class: 'btn primary sm', text: 'Sample daily PDF', onclick: function () { mockPdf('daily'); } }),
+      el('button', { class: 'btn primary sm', text: 'Sample until-now PDF', onclick: function () { mockPdf('until'); } })
+    ])
   ]));
   return box;
 }
