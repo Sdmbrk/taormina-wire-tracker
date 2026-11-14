@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.1</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.2</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.1</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.2</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.1';
+var APP_VERSION = '2.3.2';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.2', d: '2026-11-15', t: 'Reset all entries now clears every wire in and wire out entry, every stock request and every change request, so old notifications no longer come back. Users, blocks, villa types and requirements are kept. The backup is still downloaded first.' },
   { v: '2.3.1', d: '2026-11-15', t: 'The signed-in name and role now show in the top bar on phones too. On narrow screens the role is hidden and a long name is shortened, so the name stays visible next to Alerts and Log out.' },
   { v: '2.3.0', d: '2026-11-14', t: 'Google sign-in. The admin adds each person\'s Gmail address under Access control (also when adding a user). On the sign-in screen, Sign in with Google signs the person in when that address is registered, and they get their existing role. Unregistered Google accounts are turned away. Password sign-in still works.' },
   { v: '2.2.0', d: '2026-11-14', t: 'Voice entry: on Wire in and Wire Out, tap Speak and say, for example, "stock in 2.5 red 10 yellow 5, 4 blue 3" or "stock out 2.5 red 10 black 4 to Ahmed". The words are shown as a result with each size, colour and roll count, and can be corrected before you use them. Stock in opens the preview, and nothing is saved until the storekeeper confirms. Stock out fills the Wire Out form, then you choose TH and villas and press Preview. Voice works in Chrome, Edge, Samsung Internet and Safari (iPhone); other browsers can type the words. Trial tab (admin): send sample alerts to your devices, and view the app as another user (read only).' },
@@ -1680,13 +1681,13 @@ function viewData() {
   }
 
   box.appendChild(el('div', { class: 'card' }, [
-    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Danger zone' }), el('h2', { text: 'Reset issued wire to zero' }),
-      el('p', { class: 'hint', text: 'Downloads a full backup first, then clears only the issued wire quantities. Blocks, villa types and their requirements stay as they are. Type RESET to confirm.' })])]),
-    el('div', { class: 'grid-chips' }, [resetIn, el('button', { class: 'btn danger', text: 'Reset issued wire', onclick: function () {
+    el('div', { class: 'card-h' }, [el('div', {}, [el('span', { class: 'eyebrow', text: 'Danger zone' }), el('h2', { text: 'Reset all entries' }),
+      el('p', { class: 'hint', text: 'Downloads a full backup first, then clears every wire in and wire out entry, every stock request and every change request, so no old notifications remain. Users, blocks, villa types and their requirements stay as they are. Type RESET to confirm.' })])]),
+    el('div', { class: 'grid-chips' }, [resetIn, el('button', { class: 'btn danger', text: 'Reset all entries', onclick: function () {
       if (resetIn.value.trim() !== 'RESET') { toast('Type RESET to confirm', true); return; }
       download('Taormina Wire Backup before reset V' + APP_VERSION + '.json', backupText(), 'application/json');
       act(function () {
-        return rpc('wt_reset_issues', { p_token: SRV.token }).then(function (n) { resetIn.value = ''; toast('Backup downloaded · ' + n + ' issued lines cleared'); });
+        return rpc('wt_reset_issues', { p_token: SRV.token }).then(function (n) { resetIn.value = ''; toast('Backup downloaded · ' + n + ' records cleared'); });
       });
     } })])
   ]));
