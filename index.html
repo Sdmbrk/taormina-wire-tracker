@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.1.1</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.1.2</title>
 <style>
 :root{
   --teal:#0d9488;--teal-d:#0f766e;--teal-l:#ccfbf1;--navy:#0f2747;--navy-2:#1e3a5f;
@@ -302,16 +302,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.1.1</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.1.2</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.1.1';
+var APP_VERSION = '2.1.2';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control']];
 var CHANGELOG = [
+  { v: '2.1.2', d: '2026-11-14', t: 'Admin can delete any stock-in (wire in) or stock-out (wire out) entry directly, including wire out created from an accepted stock-out request. The delete is recorded in the change history as approved by the admin. Storekeeper deletes still go to the admin for approval.' },
   { v: '2.1.1', d: '2026-11-14', t: 'Delete confirmations now name the exact entry: each wire in and wire out row shows its number (#), date, delivery note and rolls, and the Type DELETE prompt repeats them. Wire in rows without a delivery note are labelled "no delivery note". Pending change cards show the same details.' },
   { v: '2.1.0', d: '2026-11-14', t: 'Rich notifications. With alerts turned on (the Enable alerts button in the header), your phone or computer shows a notification even when the app is closed. Foreman gets each wire in and wire out with TH, villa, size, colour and rolls. Storekeeper gets each stock-out request. Admin gets change requests. The person who asked is told when a stock-out or change is accepted, rejected or approved. iPhone: first add the app to the Home Screen (iOS 16.4 or later), open it from the icon, then turn on alerts.' },
   { v: '2.0.2', d: '2026-11-14', t: 'Installable app: the page now has a web app manifest, icons and a service worker. Android offers Install app; on iPhone, Add to Home Screen opens it full screen. Live data is never cached.' },
@@ -2596,6 +2597,13 @@ function outPreview() {
 /* edits and deletes of saved entries: the admin applies them at once; storekeeper sends a request */
 function changeEntry(id, action, newRolls) {
   var direct = me.role === 'admin';
+  if (direct && action === 'delete') {
+    act(function () {
+      return rpc('wt_admin_delete_entry', { p_token: SRV.token, p_entry: id })
+        .then(function () { toast('Entry deleted'); });
+    });
+    return;
+  }
   act(function () {
     return rpc('wt_request_change', { p_token: SRV.token, p_entry: id, p_action: action, p_new_rolls: newRolls, p_reason: '' })
       .then(function (reqId) {
