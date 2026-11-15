@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.8</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.9</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.8</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.9</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.8';
+var APP_VERSION = '2.3.9';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.9', d: '2026-11-15', t: 'Voice understands the sound-alike words speech gives: ton, tin or tan as ten, read as red, for or to before a colour as four or two, and similar. Works for stock in and stock out.' },
   { v: '2.3.8', d: '2026-11-15', t: 'Voice stock out is live: say TH 18 and villas, and the Wire Out form selects them as you speak, then fills the sizes and colour rolls. Voice training panel on Wire Out shows what to say and the same steps by hand. Clear form empties the form.' },
   { v: '2.3.7', d: '2026-11-15', t: 'Daily PDF report has a Villa wise table: for the selected date, each villa (or whole-TH issue) with rolls per size, colour split, total and who it was issued to, with a total row.' },
   { v: '2.3.6', d: '2026-11-15', t: 'Notification cards show the wire details on the card itself: size, colour, rolls, location, people and references, in a coloured layout per kind. If the card cannot be drawn, the plain banner is used.' },
@@ -2722,12 +2723,24 @@ var VOICE_NUM = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, s
 var VOICE_COL = { red: 'R', r: 'R', yellow: 'Y', y: 'Y', blue: 'B', b: 'B', black: 'BK', bk: 'BK', green: 'YG', yg: 'YG' };
 var VOICE_SKIP = { select: 1, to: 1, 'for': 1, villa: 1, villas: 1, stock: 1, wire: 1, 'in': 1, out: 1, the: 1, a: 1, of: 1, sqmm: 1, sq: 1, mm: 1, square: 1, millimetre: 1, millimetres: 1, millimeter: 1, millimeters: 1, rolls: 1, roll: 1, qty: 1, quantity: 1, each: 1, and: 1, 'with': 1, is: 1, size: 1, colour: 1, color: 1, please: 1, add: 1, then: 1, also: 1, at: 1, 'sqmm,': 1 };
 
+var VOICE_HOMO = { ton: 'ten', tin: 'ten', tan: 'ten', tenn: 'ten', won: 'one', wan: 'one', tu: 'two', tow: 'two', fore: 'four', ate: 'eight', tree: 'three', free: 'three', sex: 'six', sicks: 'six', fife: 'five', nin: 'nine', read: 'red', bred: 'red', rad: 'red', blew: 'blue', blu: 'blue', yello: 'yellow', yelo: 'yellow', block: 'black', blak: 'black', blac: 'black', bk: 'black', whye: 'yellow' };
+
 function voiceNormalise(t) {
   var s = ' ' + String(t || '').toLowerCase().replace(/[,;]+/g, ' ').replace(/\s+/g, ' ') + ' ';
   s = s.replace(/\bt\s+h\b/g, 'th');
   s = s.replace(/\s(\d+)\s+and\s+a\s+half\b/g, function (m, a) { return ' ' + (Number(a) + 0.5) + ' '; });
   s = s.replace(/\sand\s+a\s+half\b/g, ' .5 ');
-  var words = s.split(' ').map(function (w) { return VOICE_NUM[w] !== undefined ? String(VOICE_NUM[w]) : (w === 'point' ? '.' : w); });
+  /* speech often hears numbers and colours as sound-alike words: ton -> ten, read -> red ... */
+  var raw = s.split(' ').filter(Boolean);
+  var fixed = raw.map(function (w, i) {
+    var next = raw[i + 1] || '';
+    if (VOICE_HOMO[w]) return VOICE_HOMO[w];
+    /* "to" and "for" are also ordinary words: a number only when a colour or "point" follows */
+    if ((w === 'to' || w === 'too') && (VOICE_COL[next] || next === 'point')) return 'two';
+    if (w === 'for' && VOICE_COL[next]) return 'four';
+    return w;
+  });
+  var words = fixed.map(function (w) { return VOICE_NUM[w] !== undefined ? String(VOICE_NUM[w]) : (w === 'point' ? '.' : w); });
   s = ' ' + words.join(' ') + ' ';
   s = s.replace(/(\d)\s*\.\s*(\d)/g, '$1.$2').replace(/\s\.(\d)/g, ' 0.$1');
   s = s.replace(/(\d+(?:\.\d+)?)\s*(sqmm|sq\.?\s*mm|mm)\b/g, '$1 ');
