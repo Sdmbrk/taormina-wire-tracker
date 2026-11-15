@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.7</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.8</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.7</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.8</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.7';
+var APP_VERSION = '2.3.8';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.8', d: '2026-11-15', t: 'Voice stock out is live: say TH 18 and villas, and the Wire Out form selects them as you speak, then fills the sizes and colour rolls. Voice training panel on Wire Out shows what to say and the same steps by hand. Clear form empties the form.' },
   { v: '2.3.7', d: '2026-11-15', t: 'Daily PDF report has a Villa wise table: for the selected date, each villa (or whole-TH issue) with rolls per size, colour split, total and who it was issued to, with a total row.' },
   { v: '2.3.6', d: '2026-11-15', t: 'Notification cards show the wire details on the card itself: size, colour, rolls, location, people and references, in a coloured layout per kind. If the card cannot be drawn, the plain banner is used.' },
   { v: '2.3.5', d: '2026-11-15', t: 'Tapping a notification card (or its Open button) now always opens the app at the link, or brings the open app to the front. Errors are no longer silent.' },
@@ -2719,10 +2720,11 @@ var SpeechRec = (typeof window !== 'undefined') && (window.SpeechRecognition || 
 var voiceSt = { in: { text: '', listening: false, note: '' }, out: { text: '', listening: false, note: '' } };
 var VOICE_NUM = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90, hundred: 100 };
 var VOICE_COL = { red: 'R', r: 'R', yellow: 'Y', y: 'Y', blue: 'B', b: 'B', black: 'BK', bk: 'BK', green: 'YG', yg: 'YG' };
-var VOICE_SKIP = { stock: 1, wire: 1, 'in': 1, out: 1, the: 1, a: 1, of: 1, sqmm: 1, sq: 1, mm: 1, square: 1, millimetre: 1, millimetres: 1, millimeter: 1, millimeters: 1, rolls: 1, roll: 1, qty: 1, quantity: 1, each: 1, and: 1, 'with': 1, is: 1, size: 1, colour: 1, color: 1, please: 1, add: 1, then: 1, also: 1, at: 1, 'sqmm,': 1 };
+var VOICE_SKIP = { select: 1, to: 1, 'for': 1, villa: 1, villas: 1, stock: 1, wire: 1, 'in': 1, out: 1, the: 1, a: 1, of: 1, sqmm: 1, sq: 1, mm: 1, square: 1, millimetre: 1, millimetres: 1, millimeter: 1, millimeters: 1, rolls: 1, roll: 1, qty: 1, quantity: 1, each: 1, and: 1, 'with': 1, is: 1, size: 1, colour: 1, color: 1, please: 1, add: 1, then: 1, also: 1, at: 1, 'sqmm,': 1 };
 
 function voiceNormalise(t) {
   var s = ' ' + String(t || '').toLowerCase().replace(/[,;]+/g, ' ').replace(/\s+/g, ' ') + ' ';
+  s = s.replace(/\bt\s+h\b/g, 'th');
   s = s.replace(/\s(\d+)\s+and\s+a\s+half\b/g, function (m, a) { return ' ' + (Number(a) + 0.5) + ' '; });
   s = s.replace(/\sand\s+a\s+half\b/g, ' .5 ');
   var words = s.split(' ').map(function (w) { return VOICE_NUM[w] !== undefined ? String(VOICE_NUM[w]) : (w === 'point' ? '.' : w); });
@@ -2736,16 +2738,23 @@ function voiceParse(text, kind) {
   var raw = voiceNormalise(text);
   var mode = /\b(stock|wire) out\b/.test(raw) || / out /.test(' ' + raw + ' ') ? 'out'
     : /\b(stock|wire) in\b/.test(raw) || / in /.test(' ' + raw + ' ') ? 'in' : kind;
-  var nm = raw.match(/\b(?:to|for)\s+([a-z][a-z .'-]*?)(?=\s+(?:th|red|yellow|blue|black|green|bk|yg|\d+(?:\.\d+)?)\b|\s*$)/);
+  /* TH and villas are read first and taken out, so "to TH 18" is not read as a name */
+  var th = null, villas = [];
+  var tm = raw.match(/\bth[\s-]*([a-z]{0,2})[\s-]*(\d{1,3})\b/);
+  if (tm) { th = { letters: tm[1], num: parseInt(tm[2], 10), said: 'TH ' + (tm[1] ? tm[1].toUpperCase() + '-' : '') + tm[2] }; raw = raw.replace(tm[0], ' '); }
+  var vm = raw.match(/\bvillas?\s+((?:(?:\d+|and)\s*)+)/);
+  if (vm) {
+    villas = (vm[1].match(/\d+/g) || []).map(Number).filter(function (v, i, a) { return v > 0 && a.indexOf(v) === i; });
+    raw = raw.replace(vm[0], ' ');
+  }
+  var nm = raw.match(/\b(?:to|for)\s+([a-z][a-z .'-]*?)(?=\s+(?:red|yellow|blue|black|green|bk|yg|\d+(?:\.\d+)?)\b|\s*$)/);
   var name = nm ? nm[1].trim().replace(/\b\w/g, function (c) { return c.toUpperCase(); }) : '';
   var body = nm ? raw.replace(nm[0], ' ') : raw;
   var tokens = body.split(' ').filter(Boolean);
-  var lines = {}, notes = [], size = null, pc = null, skipNum = false, total = 0;
+  var lines = {}, notes = [], size = null, pc = null, total = 0;
   var colName = function (c) { var x = CORE_COLORS.filter(function (k) { return k.s === c; })[0]; return x ? x.n : c; };
   for (var i = 0; i < tokens.length; i++) {
     var t = tokens[i];
-    if (skipNum && /^\d+(\.\d+)?$/.test(t)) { skipNum = false; continue; }
-    if (t === 'th') { skipNum = true; continue; }
     if (t === 'yellow' && tokens[i + 1] === 'green') { pc = 'YG'; i++; continue; }
     if (VOICE_COL[t]) { if (pc) notes.push('no quantity for ' + colName(pc)); pc = VOICE_COL[t]; continue; }
     if (/^\d+(\.\d+)?$/.test(t)) {
@@ -2763,7 +2772,49 @@ function voiceParse(text, kind) {
     if (notes.indexOf(note) < 0) notes.push(note);
   }
   if (pc) notes.push('no quantity for ' + colName(pc));
-  return { mode: mode, lines: lines, name: name, notes: notes, total: round2(total) };
+  var thName = th ? voiceFindTh(th) : null;
+  if (th && !thName) notes.push(th.said + ' is not in your TH list');
+  return { mode: mode, lines: lines, name: name, notes: notes, total: round2(total), th: th, thName: thName, villas: villas };
+}
+
+/* the TH the voice means, matched against the TH names in the store (TH 18 matches TH-18 or TH-18 B1, not TH-R18) */
+function voiceFindTh(th) {
+  var hits = thList().filter(function (t) {
+    var m = t.toLowerCase().replace(/[^a-z0-9]/g, '').match(/^th([a-z]*?)0*(\d+)$/);
+    return m && m[1] === th.letters && Number(m[2]) === th.num;
+  });
+  return hits.length === 1 ? hits[0] : null;
+}
+
+/* villa numbers said by voice are ticked in every block of that TH, using the same numbers the tiles show */
+function voiceVillaPicks(th, villas) {
+  var out = [];
+  blocksOfTh(th).forEach(function (b) {
+    for (var v = 1; v <= villasIn(b); v++) if (villas.indexOf(v) >= 0) out.push({ block: b.block, villa: v });
+  });
+  return out;
+}
+
+/* live: fills the Wire Out form straight away from what was said. Nothing is saved until Preview is pressed. */
+function voiceApplyOut(p) {
+  if (p.thName && draft.th !== p.thName) { draft.th = p.thName; draft.picks = []; }
+  if (p.villas.length && draft.th) draft.picks = voiceVillaPicks(draft.th, p.villas);
+  if (p.total) {
+    draft.mode = 'custom';
+    SIZES.forEach(function (sz) {
+      if (!p.lines[sz]) return;
+      if (draft.sizes.indexOf(sz) < 0) draft.sizes = draft.sizes.concat([sz]);
+      CORE_COLORS.forEach(function (c) { if (p.lines[sz][c.s]) draft.cr[sz][c.s] = p.lines[sz][c.s]; });
+    });
+  }
+  if (p.name && canRequestOut()) draft.to = p.name;
+  tab = 'issues';
+  render();
+}
+
+function voiceClearForm() {
+  draft.th = ''; draft.picks = []; draft.sizes = ['2.5']; draft.cr = zeroSizeCr();
+  render();
 }
 
 function voiceListen(kind) {
@@ -2774,7 +2825,11 @@ function voiceListen(kind) {
   try { rec = new SpeechRec(); } catch (e) { toast('Voice could not start in this browser. Type the words instead.', true); return; }
   rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
   st.listening = true; st.note = ''; render();
-  rec.onresult = function (ev) { st.text = ev.results[0][0].transcript; st.listening = false; render(); };
+  rec.onresult = function (ev) {
+    st.text = ev.results[0][0].transcript; st.listening = false;
+    if (kind === 'out') { var p = voiceParse(st.text, 'out'); if (p.mode === 'out' && (p.thName || p.villas.length || p.total)) voiceApplyOut(p); }
+    render();
+  };
   rec.onerror = function (ev) {
     st.listening = false;
     st.note = ev.error === 'not-allowed' ? 'The microphone is blocked. Allow it in the browser settings, then try again.'
@@ -2799,15 +2854,8 @@ function voiceUseIn(p) {
 }
 
 function voiceUseOut(p) {
-  draft.sizes = SIZES.filter(function (sz) { return p.lines[sz]; });
-  draft.mode = 'custom';
-  draft.cr = zeroSizeCr();
-  draft.sizes.forEach(function (sz) { CORE_COLORS.forEach(function (c) { if (p.lines[sz][c.s]) draft.cr[sz][c.s] = p.lines[sz][c.s]; }); });
-  if (p.name && canRequestOut()) draft.to = p.name;
-  voiceReset('out');
-  tab = 'issues';
-  render();
-  toast('Filled from your voice. Choose the TH and villas, then press Preview. Each selected villa gets these rolls.');
+  voiceApplyOut(p);
+  toast('Filled the form from your voice. Check it, then press Preview.');
 }
 
 function voiceResult(kind, p) {
@@ -2822,8 +2870,10 @@ function voiceResult(kind, p) {
   });
   var head = el('div', { class: 'voice-row' }, [
     el('span', { class: 'pill ' + (p.mode === 'in' ? 'p-ok' : 'p-over'), text: p.mode === 'in' ? 'Stock in' : 'Stock out' }),
+    p.thName ? el('b', { text: p.thName }) : null,
+    p.villas.length ? el('span', { class: 'note', text: 'villa ' + p.villas.join(', ') }) : null,
     p.name ? el('b', { text: 'to ' + p.name }) : null,
-    el('span', { class: 'wq', text: fmt(p.total) + ' rolls total' })
+    p.total ? el('span', { class: 'wq', text: fmt(p.total) + ' rolls total' }) : null
   ]);
   var notes = p.notes.length ? el('p', { class: 'hint', text: 'Not understood: ' + p.notes.join(' · ') + '. Correct the words above and check again.' }) : null;
   var action = null;
@@ -2834,7 +2884,7 @@ function voiceResult(kind, p) {
       : el('p', { class: 'hint', text: 'Stock in is entered on the Overview page, under Wire in.' });
   } else {
     action = kind === 'out' && (canWriteStore() || canRequestOut())
-      ? el('button', { class: 'btn primary sm', text: canRequestOut() ? 'Use for stock-out request' : 'Use for stock out', onclick: function () { voiceUseOut(p); } })
+      ? el('button', { class: 'btn primary sm', text: 'Apply to form', onclick: function () { voiceUseOut(p); } })
       : el('p', { class: 'hint', text: 'Stock out is entered on the Wire Out tab.' });
   }
   return el('div', { class: 'voice-res' }, [head].concat(rows, [notes, el('div', { class: 'grid-chips', style: 'margin-top:8px' }, [
@@ -2852,11 +2902,45 @@ function voiceCard(kind) {
     ]),
     el('div', { class: 'voice-row' }, [
       el('button', { class: 'btn primary sm', text: st.listening ? 'Listening…' : 'Speak', onclick: function () { voiceListen(kind); } }),
-      el('span', { class: 'hint', text: 'Example: ' + (kind === 'in' ? '"stock in 2.5 red 10 yellow 5, 4 blue 3"' : '"stock out 2.5 red 10 black 4 to Ahmed"') })
+      el('span', { class: 'hint', text: 'Example: ' + (kind === 'in' ? '"stock in 2.5 red 10 yellow 5, 4 blue 3"' : '"stock out 2.5 red 10 black 4 to TH 18 villa 1, 2, 3"') })
     ]),
+    kind === 'out' ? el('div', { class: 'grid-chips', style: 'margin-bottom:6px' }, [
+      el('button', { class: 'btn ghost sm', text: ui.voiceTrain ? 'Hide voice training' : 'Voice training', onclick: function () { ui.voiceTrain = !ui.voiceTrain; render(); } }),
+      el('button', { class: 'btn ghost sm', text: 'Clear form', onclick: voiceClearForm })
+    ]) : null,
+    kind === 'out' && ui.voiceTrain ? voiceTraining() : null,
     el('textarea', { class: 'txt voice-txt', rows: '2', placeholder: 'Or type here', onchange: function () { st.text = this.value; render(); } }, [st.text]),
     st.note ? el('p', { class: 'hint', text: st.note }) : null,
     p ? voiceResult(kind, p) : null
+  ]);
+}
+
+/* Training for voice stock out: what to say, what should appear, and the same job done by hand to compare */
+function voiceTraining() {
+  var step = function (n, txt) { return el('div', { class: 'voice-row' }, [el('span', { class: 'pill', text: String(n) }), el('span', { text: txt })]); };
+  var phrase = function (say, does) { return el('div', { class: 'voice-row' }, [el('b', { text: '"' + say + '"' }), el('span', { class: 'note', text: does })]); };
+  return el('div', { class: 'voice-res' }, [
+    el('b', { text: 'Voice training: stock out' }),
+    el('p', { class: 'hint', text: 'Say the whole sentence in one go. The form fills after you finish speaking, not word by word.' }),
+    el('p', { style: 'margin:6px 0', text: 'Say: "stock out 2.5 red 10, yellow 10, blue 5, black 12 to TH 18 villa 1, 2, 3"' }),
+    el('b', { style: 'display:block;margin-top:8px', text: 'What should appear' }),
+    step(1, 'TH 18 is selected in the TH list.'),
+    step(2, 'Villas 1, 2 and 3 are ticked.'),
+    step(3, '2.5 sqmm shows Red 10, Yellow 10, Blue 5 and Black 12 in Custom rolls.'),
+    step(4, 'Check it, then press Preview. The storekeeper confirms it.'),
+    el('b', { style: 'display:block;margin-top:8px', text: 'Do the same by hand, to compare' }),
+    step(1, 'Open Wire Out and tap TH-18.'),
+    step(2, 'Tap V01, V02 and V03.'),
+    step(3, 'Tap 2.5 sqmm. Choose Custom rolls.'),
+    step(4, 'Enter Red 10, Yellow 10, Blue 5 and Black 12.'),
+    step(5, 'Press Preview.'),
+    el('b', { style: 'display:block;margin-top:8px', text: 'Practice phrases (one at a time)' }),
+    phrase('select TH 18', 'Selects TH 18 and clears the villa ticks.'),
+    phrase('villa 1, 2, 3', 'Ticks villas 1, 2 and 3 in the TH already selected.'),
+    phrase('2.5 red 10, yellow 10', 'Fills 2.5 sqmm Red 10 and Yellow 10.'),
+    phrase('4 blue 5', 'Adds 4 sqmm Blue 5, keeping what was filled before.'),
+    phrase('stock out 6 black 12 to Ahmed', 'Adds 6 sqmm Black 12 and sets the name (foreman requests).'),
+    el('p', { class: 'hint', text: 'If a TH or villa is not found, the note under the result says so. Use Clear form to start again.' })
   ]);
 }
 
