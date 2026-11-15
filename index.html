@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.9</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.10</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -308,16 +308,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.9</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.10</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.9';
+var APP_VERSION = '2.3.10';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.10', d: '2026-11-15', t: 'Voice: stockout is read as stock out, point 50 or point five after stock out is the 2.5 size, and 2.50 is read as 2.5.' },
   { v: '2.3.9', d: '2026-11-15', t: 'Voice understands the sound-alike words speech gives: ton, tin or tan as ten, read as red, for or to before a colour as four or two, and similar. Works for stock in and stock out.' },
   { v: '2.3.8', d: '2026-11-15', t: 'Voice stock out is live: say TH 18 and villas, and the Wire Out form selects them as you speak, then fills the sizes and colour rolls. Voice training panel on Wire Out shows what to say and the same steps by hand. Clear form empties the form.' },
   { v: '2.3.7', d: '2026-11-15', t: 'Daily PDF report has a Villa wise table: for the selected date, each villa (or whole-TH issue) with rolls per size, colour split, total and who it was issued to, with a total row.' },
@@ -2730,6 +2731,8 @@ function voiceNormalise(t) {
   s = s.replace(/\bt\s+h\b/g, 'th');
   s = s.replace(/\s(\d+)\s+and\s+a\s+half\b/g, function (m, a) { return ' ' + (Number(a) + 0.5) + ' '; });
   s = s.replace(/\sand\s+a\s+half\b/g, ' .5 ');
+  /* "stockout" is one word to the speech engine; "point 50" or "point five" after stock out means the 2.5 size */
+  s = s.replace(/\bstockout\b/g, 'stock out').replace(/\bstock out point\s*(50|five|5)\b/g, 'stock out 2.5');
   /* speech often hears numbers and colours as sound-alike words: ton -> ten, read -> red ... */
   var raw = s.split(' ').filter(Boolean);
   var fixed = raw.map(function (w, i) {
@@ -2777,7 +2780,8 @@ function voiceParse(text, kind) {
         else if (q > 0) { lines[size] = lines[size] || {}; lines[size][pc] = (lines[size][pc] || 0) + q; total += q; }
         pc = null; continue;
       }
-      if (SIZES.indexOf(t) >= 0) { size = t; continue; }
+      var sz0 = String(Number(t));
+      if (SIZES.indexOf(sz0) >= 0) { size = sz0; continue; }
       notes.push('number ' + t + ' is not a size (2.5, 4 or 6)'); continue;
     }
     if (VOICE_SKIP[t]) continue;
