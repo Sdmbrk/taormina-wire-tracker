@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taormina Village-01 · Wire Issue Tracker v2.3.13</title>
+<title>Taormina Village-01 · Wire Issue Tracker v2.3.14</title>
 <style>
 .voice-card{margin:0 0 14px;padding:12px;border:1px dashed #94a3b8;border-radius:12px;background:#f8fafc}
 .voice-card .voice-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
@@ -37,8 +37,8 @@ main{max-width:1280px;margin:0 auto;padding:22px 16px 40px}
 .eyebrow{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--teal-d);font-weight:700}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.5}
 .grid-chips{display:flex;flex-wrap:wrap;gap:8px}
-.th-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
-.th-grid .chip{display:block;width:100%;box-sizing:border-box;min-width:0;min-height:0;padding:9px 0;font-size:11px;letter-spacing:-.2px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.th-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.th-grid .chip{display:block;width:100%;box-sizing:border-box;min-width:0;min-height:0;padding:10px 0;font-size:12px;letter-spacing:-.2px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chip{font:inherit;font-weight:600;font-size:13px;border:1px solid #cfe3e1;background:#fff;color:var(--navy);padding:9px 15px;border-radius:999px;cursor:pointer;transition:all .15s}
 .chip:hover{border-color:var(--teal);color:var(--teal-d);transform:translateY(-1px)}
 .chip.on{background:linear-gradient(135deg,var(--teal),var(--teal-d));border-color:transparent;color:#fff;box-shadow:0 8px 18px -8px rgba(13,148,136,.85)}
@@ -310,16 +310,17 @@ footer b{color:var(--teal-d)}
 </header>
 <nav id="nav"></nav>
 <main id="app"></main>
-<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.13</footer>
+<footer><b>SDMBRK Collections</b> · Taormina Village-01 · Wire Issue Tracker v2.3.14</footer>
 <div id="toast" class="toast"></div>
 
 <script>
-var APP_VERSION = '2.3.13';
+var APP_VERSION = '2.3.14';
 var KEY = 'taormina-wire-tracker-v2';
 var SIZES = ['2.5', '4', '6'];
 var SIZE_COLOR = { '2.5': '#0ea5e9', '4': '#8b5cf6', '6': '#f59e0b' };
 var TABS = [['report', 'Overview'], ['issues', 'Wire Out'], ['blocks', 'Blocks & villas'], ['types', 'Villa types'], ['reports', 'Reports'], ['data', 'Backup & log'], ['access', 'Access control'], ['trial', 'Trial']];
 var CHANGELOG = [
+  { v: '2.3.14', d: '2026-11-15', t: 'Wire Out: TH number buttons are laid out five in a row, with more room for each label.' },
   { v: '2.3.13', d: '2026-11-15', t: 'Wire Out: TH number buttons show their full labels in the six-column layout.' },
   { v: '2.3.12', d: '2026-11-15', t: 'Wire Out: the TH number buttons are laid out six in a row.' },
   { v: '2.3.11', d: '2026-11-15', t: 'Stock out is entered by hand again: the voice entry is removed from the Wire Out tab. Voice stock in on the Overview page is unchanged.' },
